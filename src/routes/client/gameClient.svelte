@@ -1,7 +1,8 @@
+<!-- 
+  ALL RIGHTS RESERVED Codetoil (c) 2021-2023 
+-->
+
 <script lang="ts">
-/**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
- */
 
 import * as BABYLON from "@babylonjs/core";
 import { onMount } from "svelte";
