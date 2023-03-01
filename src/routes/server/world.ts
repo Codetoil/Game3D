@@ -4,11 +4,17 @@
 
 import * as BABYLON from "@babylonjs/core";
 
-export class World {
-  public grounds: BABYLON.Mesh[];
-  public walls: BABYLON.Mesh[];
-  public engine: BABYLON.Engine;
-  public scene: BABYLON.Scene;
+export class Ground {
+    
+}
 
-  public tick() {}
+export class Wall {
+    
+}
+
+export class World {
+    public grounds: Ground[];
+    public walls: Wall[];
+
+    public tick() {}
 }
