@@ -5,11 +5,11 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { onMount } from "svelte"
-import { Player } from "../server/characterController";
-import { World } from "../server/world";
+import { PlayerClient } from "./entityClient";
+import { WorldClient } from "./worldClient";
 
-export class Game3D {
-  public ready: Promise<Game3D>;
+export class GameClient {
+  public ready: Promise<GameClient>;
   public started: boolean;
   public stopped: boolean;
 
@@ -17,9 +17,9 @@ export class Game3D {
   public canvas!: HTMLCanvasElement;
   public scene!: BABYLON.Scene;
 
-  public player!: Player;
+  public player!: PlayerClient;
   public camera!: BABYLON.ArcFollowCamera;
-  public world!: World;
+  public world!: WorldClient;
 
   constructor() {
     this.started = false;
@@ -80,7 +80,7 @@ export class Game3D {
       new BABYLON.Vector3(0, 1, 0),
       this.scene
     );
-    this.world = new World();
+    this.world = new WorldClient();
     this.world.engine = this.engine;
     this.world.scene = this.scene;
     // Create the player entity
@@ -149,6 +149,7 @@ export class Game3D {
       ).toQuaternion();
     }
 
+    this.world.init();
     this.world.grounds = [];
     this.world.walls = [];
     /*var ceilings = [];*/
@@ -244,22 +245,22 @@ export class Game3D {
     return this.scene;
   }
 
-  private beforeRender(game3D: Game3D) {
-    if (!game3D.started || game3D.stopped) return;
-    game3D.world.tick();
-    game3D.player.tick(game3D.camera.rotationQuaternion);
+  private beforeRender(gameClient: GameClient) {
+    if (!gameClient.started || gameClient.stopped) return;
+    gameClient.world.tick();
+    gameClient.player.tick(gameClient.camera.rotationQuaternion);
   }
 }
 
 export class EventHandler {
-  public static onResize(game3D: Game3D) {
-    game3D.engine.resize();
+  public static onResize(gameClient: GameClient) {
+    gameClient.engine.resize();
   }
 }
 
-var game3D: Game3D = new Game3D();
+var gameClient: GameClient = new GameClient();
 
-game3D.ready.then((value) => {
+gameClient.ready.then((value) => {
   window.addEventListener("resize", EventHandler.onResize.bind(null, value));
 
   value.engine.runRenderLoop(() => {

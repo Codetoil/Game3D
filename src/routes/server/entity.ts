@@ -3,14 +3,11 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
-import { World } from "./world";
-import { PlayerInputController } from "./playerInputController";
-import { Mesh } from "@babylonjs/core";
+import { WallClient } from "../client/worldClient";
+import type { InputController } from "./inputController";
+import { Wall, World } from "./world";
 
 export abstract class Entity {
-  public mesh: BABYLON.Mesh;
-  public texture: BABYLON.Texture;
-
   public world: World;
 
   public pos: BABYLON.Vector3;
@@ -23,7 +20,7 @@ export abstract class Entity {
 
   public abstract gravity: number;
 
-  protected constructor(world: World) {
+  public constructor(world: World) {
     this.world = world;
     this.velH = new BABYLON.Vector3(0.0, 0.0, 0.0);
     this.vely = 0.0;
@@ -61,12 +58,12 @@ export abstract class Entity {
   }
 }
 
-export class Player extends Entity {
+export abstract class Player extends Entity {
   public maxHSpeed: number;
   public canWallJump = true;
-  public lastWallWallJumpedFrom: BABYLON.Mesh = null;
+  public lastWallWallJumpedFrom: Wall = null;
   public jumpState = false;
-  public inputController: PlayerInputController;
+  public inputController: InputController;
   public facingDirection: BABYLON.Vector3;
 
   public get gravity(): number {
@@ -77,7 +74,7 @@ export class Player extends Entity {
 
   public constructor(world: World) {
     super(world);
-    this.inputController = new PlayerInputController(world.engine);
+    // this.inputController = new PlayerInputController(world.engine);
   }
 
   protected get hMovementScaleFactor() {
@@ -229,7 +226,8 @@ export class Player extends Entity {
     console.assert(!!cameraAngle, "Camera angle cannot be undefined");
 
     this.checkCollisions();
-    this.inputController.tick(cameraAngle);
+    this.inputController.tick();
+    this.inputController.joystick.rotateByQuaternionToRef(cameraAngle, this.inputController.joystick);
     this.checkCollisions();
 
     this.moveMesh();

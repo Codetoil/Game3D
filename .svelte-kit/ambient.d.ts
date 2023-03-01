@@ -127,6 +127,7 @@ declare module '$env/static/private' {
 	export const CODESANDBOX_HOST: string;
 	export const npm_execpath: string;
 	export const NVM_CD_FLAGS: string;
+	export const npm_package_dependencies_ts_mixer: string;
 	export const npm_package_devDependencies__sveltejs_adapter_auto: string;
 	export const npm_config_save_prefix: string;
 	export const npm_config_ignore_optional: string;
@@ -266,6 +267,7 @@ declare module '$env/dynamic/private' {
 		CODESANDBOX_HOST: string;
 		npm_execpath: string;
 		NVM_CD_FLAGS: string;
+		npm_package_dependencies_ts_mixer: string;
 		npm_package_devDependencies__sveltejs_adapter_auto: string;
 		npm_config_save_prefix: string;
 		npm_config_ignore_optional: string;

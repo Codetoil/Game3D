@@ -3,18 +3,22 @@
  */
 
 import { World, Ground, Wall } from "../server/world";
-import * as BABYLON from "@babylonjs/core"
+import * as BABYLON from "@babylonjs/core";
 
 export class GroundClient extends Ground {
-    public mesh: BABYLON.Mesh;
+  public mesh: BABYLON.Mesh;
 }
 
 export class WallClient extends Wall {
-    public mesh: BABYLON.Mesh;
+  public mesh: BABYLON.Mesh;
 }
 
-export class WorldClient extends World
-{
-    public engine: BABYLON.Engine;
-    public scene: BABYLON.Scene;
+export class WorldClient extends World {
+  public engine: BABYLON.Engine;
+  public scene: BABYLON.Scene;
+  public cameraAngle: BABYLON.Quaternion;
+
+  public tick() {
+    super.tick();
+  }
 }

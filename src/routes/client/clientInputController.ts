@@ -3,8 +3,13 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
+import { Entity } from "../server/entity";
+import type { InputController } from "../server/inputController";
+import { World } from "../server/world";
+import { EntityClient, PlayerClient } from "./entityClient";
+import { WorldClient } from "./worldClient";
 
-export class PlayerInputController {
+export class PlayerInputController implements InputController {
   private deviceSourceManager: BABYLON.DeviceSourceManager;
   public sprintHeld: boolean;
   public jumpPressed: boolean;
@@ -24,7 +29,15 @@ export class PlayerInputController {
     }
   }
 
-  public tick(cameraAngle: BABYLON.Quaternion) {
+  public tick(entity: Entity, world: World) {
+    if (!(entity instanceof PlayerClient)) {
+      throw new Error("Entity is not a client player.");
+    }
+    if (!(world instanceof WorldClient)) {
+      throw new Error("World is not a client world.");
+    }
+    let playerClient = entity as PlayerClient;
+    let worldClient = world as WorldClient;
     this.sprintHeld = false;
     this.jumpPressed = false;
     this.joystick = this.joystick.scale(0.0);
@@ -103,7 +116,10 @@ export class PlayerInputController {
         gamepadSource.getInput(0) === 1 ||
         gamepadSource.getInput(1) === 1;
     }
-    this.joystick.rotateByQuaternionToRef(cameraAngle, this.joystick);
+    this.joystick.rotateByQuaternionToRef(
+      worldClient.cameraAngle,
+      this.joystick
+    );
     //console.debug(this.joystick);
   }
 }
