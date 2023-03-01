@@ -1,12 +1,12 @@
 <script lang="ts">
 /**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2022
+ * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
 
 import * as BABYLON from "@babylonjs/core";
 import { onMount } from "svelte"
-import { Player } from "./characterController";
-import { World } from "./world";
+import { Player } from "../server/characterController";
+import { World } from "../server/world";
 
 export class Game3D {
   public ready: Promise<Game3D>;
