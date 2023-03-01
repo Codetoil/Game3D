@@ -3,29 +3,25 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
+import { Quaternion } from "@babylonjs/core";
 import { WallClient } from "../client/worldClient";
 import type { InputController } from "./inputController";
 import { Ground, Wall, World } from "./world";
 
 export abstract class Entity {
-  public mesh: BABYLON.Mesh;
+  public mesh!: BABYLON.Mesh;
 
-  public world: World;
+  public world!: World;
 
-  public pos: BABYLON.Vector3;
-  public velH: BABYLON.Vector3;
-  public vely: number;
-  public rot: BABYLON.Quaternion;
+  public pos!: BABYLON.Vector3;
+  public velH: BABYLON.Vector3 = new BABYLON.Vector3(0.0, 0.0, 0.0);
+  public vely: number = 0.0;
+  public rot!: BABYLON.Quaternion;
 
-  public onGround: boolean;
-  public onWall: boolean;
+  public onGround: boolean = false; 
+  public onWall: boolean = false;
 
   public abstract gravity: number;
-
-  public constructor() {
-    this.velH = new BABYLON.Vector3(0.0, 0.0, 0.0);
-    this.vely = 0.0;
-  }
 
   public setWorld(world: World): Entity {
     this.world = world;
@@ -65,12 +61,12 @@ export abstract class Entity {
 }
 
 export abstract class Player extends Entity {
-  public maxHSpeed: number;
+  public maxHSpeed: number = -1.0;
   public canWallJump = true;
-  public lastWallWallJumpedFrom: Wall = null;
+  public lastWallWallJumpedFrom: BABYLON.Nullable<Wall> = null;
   public jumpState = false;
-  public inputController: InputController;
-  public facingDirection: BABYLON.Vector3;
+  public inputController!: InputController;
+  public facingDirection: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 1).normalize();
 
   public get gravity(): number {
     if (this.onWall) return -1.667;
@@ -123,37 +119,43 @@ export abstract class Player extends Entity {
 
   public wallJump() {
     if (!this.facingDirection) return;
-    let ray = new BABYLON.Ray(this.pos, this.facingDirection, 1);
-    let rayHelper = new BABYLON.RayHelper(ray);
+    let ray: BABYLON.Ray = new BABYLON.Ray(this.pos, this.facingDirection, 1);
+    let rayHelper: BABYLON.RayHelper = new BABYLON.RayHelper(ray);
     rayHelper.show(this.world.scene, BABYLON.Color3.Red());
-    let hit = this.world.scene.pickWithRay(ray, (mesh: BABYLON.Mesh) => {
-      return this.world.walls.includes(mesh);
+    let hitNullable: BABYLON.Nullable<BABYLON.PickingInfo> = this.world.scene.pickWithRay(ray, (mesh: BABYLON.AbstractMesh) => {
+      return this.world.walls.map((wall1) => wall1.mesh).includes(mesh);
     });
-    let wall = hit.pickedMesh;
-    if (!wall) return;
-    if (this.lastWallWallJumpedFrom !== wall) {
-      let normalV: BABYLON.Vector3 = hit.getNormal(true);
-      console.debug([wall, normalV]);
-      let rayNormal = new BABYLON.Ray(hit.pickedPoint, normalV, 1);
+    if (!hitNullable) return;
+    let hit: BABYLON.PickingInfo = hitNullable;
+    if (!hit.pickedMesh) return;
+    let wall: BABYLON.AbstractMesh = hit.pickedMesh;
+    if (!(this.lastWallWallJumpedFrom === null) && this.lastWallWallJumpedFrom?.mesh !== wall) {
+      let normalVectorNullable: BABYLON.Nullable<BABYLON.Vector3> = hit.getNormal(true);
+      if (!normalVectorNullable) return;
+      let normalVector: BABYLON.Vector3 = normalVectorNullable;
+      console.debug([wall, normalVector]);
+      if (!hit.pickedPoint) return;
+      let rayNormal = new BABYLON.Ray(hit.pickedPoint, normalVector, 1);
       new BABYLON.RayHelper(rayNormal).show(
         this.world.scene,
         BABYLON.Color3.Blue()
       );
       let normal: BABYLON.Quaternion = new BABYLON.Quaternion(
-        normalV.x,
-        normalV.y,
-        normalV.z,
+        normalVector.x,
+        normalVector.y,
+        normalVector.z,
         0.0
       );
+      console.assert(!!this.mesh.rotationQuaternion, "Rotation Quaternion cannot be null");
       this.mesh.rotationQuaternion = normal
-        .multiply(this.mesh.rotationQuaternion.multiply(normal))
+        .multiply((this.mesh.rotationQuaternion as Quaternion).multiply(normal))
         .normalize();
       this.velH = this.velH.subtract(
-        normalV.scale(2 * BABYLON.Vector3.Dot(this.velH, normalV))
+        normalVectorNullable.scale(2 * BABYLON.Vector3.Dot(this.velH, normalVectorNullable))
       );
       this.vely = 28.0;
       this.canWallJump = false;
-      this.lastWallWallJumpedFrom = wall as Mesh;
+      this.lastWallWallJumpedFrom.mesh = wall as BABYLON.AbstractMesh;
     }
   }
 
@@ -224,7 +226,8 @@ export abstract class Player extends Entity {
 
     this.mesh.position = this.mesh.position.add(deltaPos);
     this.pos = this.mesh.position;
-    this.rot = this.mesh.rotationQuaternion;
+    console.assert(!!this.mesh.rotationQuaternion, "Rotation quaternion cannot be undefined");
+    this.rot = this.mesh.rotationQuaternion as BABYLON.Quaternion;
   }
 
   public tick(cameraAngle: BABYLON.Quaternion) {

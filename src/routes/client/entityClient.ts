@@ -10,16 +10,15 @@ import { World } from "../server/world";
 import { WorldClient } from "./worldClient";
 
 export abstract class EntityClient extends Entity {
-  public texture: BABYLON.Texture;
-  public world: WorldClient;
+  public texture?: BABYLON.Texture;
+  public world!: WorldClient;
 }
 
 export class PlayerClient extends Mixin(Player, EntityClient) {
-  public world: WorldClient;
+  public world!: WorldClient;
 
-  public constructor(world: WorldClient)
+  public constructor()
   {
     super();
-    this.inputController = new PlayerInputController(world.scene.getEngine());
   }
 }

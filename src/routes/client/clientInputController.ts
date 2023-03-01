@@ -10,16 +10,13 @@ import { EntityClient, PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 
 export class PlayerInputController implements InputController {
-  private deviceSourceManager: BABYLON.DeviceSourceManager;
-  public sprintHeld: boolean;
-  public jumpPressed: boolean;
-  public joystick: BABYLON.Vector3;
+  private deviceSourceManager!: BABYLON.DeviceSourceManager;
+  public joystick: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 0);
+  public sprintHeld: boolean = false;
+  public jumpPressed: boolean = false;
 
-  public constructor(engine: BABYLON.Engine) {
+  public setEngine(engine: BABYLON.Engine) {
     this.deviceSourceManager = new BABYLON.DeviceSourceManager(engine);
-    this.joystick = new BABYLON.Vector3(0, 0, 0);
-    this.sprintHeld = false;
-    this.jumpPressed = false;
   }
 
   private setJoystickIfBigger(x: number, z: number) {
@@ -36,7 +33,6 @@ export class PlayerInputController implements InputController {
     if (!(world instanceof WorldClient)) {
       throw new Error("World is not a client world.");
     }
-    let playerClient = entity as PlayerClient;
     let worldClient = world as WorldClient;
     this.sprintHeld = false;
     this.jumpPressed = false;
@@ -72,7 +68,6 @@ export class PlayerInputController implements InputController {
         gamepadSource.getInput(3) === 1;
       this.setJoystickIfBigger(
         -gamepadSource.getInput(15),
-
         gamepadSource.getInput(14)
       );
       this.jumpPressed =
@@ -120,6 +115,5 @@ export class PlayerInputController implements InputController {
       worldClient.cameraAngle,
       this.joystick
     );
-    //console.debug(this.joystick);
   }
 }

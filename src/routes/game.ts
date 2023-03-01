@@ -1,4 +1,3 @@
-<script lang="ts">
 /**
  * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
@@ -6,19 +5,13 @@
 import * as BABYLON from "@babylonjs/core";
 
 export abstract class Game {
-    public ready: Promise<Game>;
-    public started: boolean;
-    public stopped: boolean;
+    public ready: Promise<Game> = new Promise((resolve, reject) => {
+        return this.init(resolve, reject);
+    });
+    public started: boolean = false;
+    public stopped: boolean = false;
 
     public engine!: BABYLON.Engine;
-
-    public constructor() {
-        this.started = false;
-        this.stopped = false;
-        this.ready = new Promise((resolve, reject) => {
-            return this.init(resolve, reject);
-        });
-    }
 
     public abstract createEngine(): Promise<BABYLON.Engine>;
     public abstract createScene(): Promise<BABYLON.Scene>;
@@ -48,4 +41,3 @@ export abstract class Game {
         return this;
     }
 }
-</script>
