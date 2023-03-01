@@ -48,7 +48,7 @@ export class GameClient extends Game {
     console.log("Using WebGPU: " + webGPUSupported)
     if (webGPUSupported) {
       this.engine = new BABYLON.WebGPUEngine(this.canvas, {
-        antialiasing: true,
+        antialias: true,
         stencil: true,
       });
       await (this.engine as BABYLON.WebGPUEngine).initAsync();
