@@ -11,7 +11,7 @@ import { WorldClient } from "./worldClient";
 
 export class PlayerInputController implements InputController {
   private deviceSourceManager!: BABYLON.DeviceSourceManager;
-  public joystick: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 0);
+  public joystick: BABYLON.Vector3 = BABYLON.Vector3.Zero();
   public sprintHeld: boolean = false;
   public jumpPressed: boolean = false;
 
@@ -36,7 +36,7 @@ export class PlayerInputController implements InputController {
     let worldClient = world as WorldClient;
     this.sprintHeld = false;
     this.jumpPressed = false;
-    this.joystick = this.joystick.scale(0.0);
+    this.joystick = BABYLON.Vector3.Zero();
     if (this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard)) {
       let keyboardSource = this.deviceSourceManager.getDeviceSource(
         BABYLON.DeviceType.Keyboard

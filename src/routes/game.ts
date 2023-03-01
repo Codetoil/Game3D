@@ -35,9 +35,12 @@ export abstract class Game {
                 console.error("The available createEngine function failed.");
                 console.error(e);
                 reject(e);
-            });
-        this.started = true;
-        console.info("Starting game...");
+            }).then(
+                () => {
+                    this.started = true;
+                    console.info("Starting game...");
+                }
+            );
         return this;
     }
 }

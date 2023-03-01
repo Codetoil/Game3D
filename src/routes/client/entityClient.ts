@@ -4,9 +4,10 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { Mixin } from "ts-mixer";
-import { PlayerInputController } from "./clientInputController";
 import { Entity, Player } from "../server/entity";
+import type { InputController } from "../server/inputController";
 import { World } from "../server/world";
+import { PlayerInputController } from "./clientInputController";
 import { WorldClient } from "./worldClient";
 
 export abstract class EntityClient extends Entity {
@@ -16,9 +17,17 @@ export abstract class EntityClient extends Entity {
 
 export class PlayerClient extends Mixin(Player, EntityClient) {
   public world!: WorldClient;
+  public inputController: PlayerInputController;
 
   public constructor()
   {
     super();
+    this.inputController = new PlayerInputController();
+  }
+
+  public setWorld(world: World): PlayerClient {
+      super.setWorld(world);
+      this.inputController.setEngine(this.world.scene.getEngine());
+      return this;
   }
 }

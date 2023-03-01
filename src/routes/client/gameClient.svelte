@@ -4,14 +4,14 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
-import { onMount } from "svelte"
+import { onMount } from "svelte";
 import { Game } from "../game";
 import { PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 
 export class GameClient extends Game {
   public ready: Promise<GameClient> = new Promise((resolve, reject) => {
-        return this.init(resolve, reject);
+      onMount(() => this.init(resolve, reject));
     });
   public canvas!: HTMLCanvasElement;
 
@@ -19,6 +19,7 @@ export class GameClient extends Game {
   public world!: WorldClient;
 
   public init(resolve: (value: GameClient | PromiseLike<GameClient>) => void, reject: (reason?: any) => void): GameClient {
+    this.canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
     return super.init(oldArgs => resolve(this.convertFromValue(oldArgs)), reject) as GameClient;
   }
 
@@ -44,6 +45,7 @@ export class GameClient extends Game {
 
   public async createEngine(): Promise<BABYLON.Engine> {
     const webGPUSupported = await BABYLON.WebGPUEngine.IsSupportedAsync;
+    console.log("Using WebGPU: " + webGPUSupported)
     if (webGPUSupported) {
       this.engine = new BABYLON.WebGPUEngine(this.canvas, {
         antialiasing: true,

@@ -4,7 +4,6 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { Quaternion } from "@babylonjs/core";
-import { WallClient } from "../client/worldClient";
 import type { InputController } from "./inputController";
 import { Ground, Wall, World } from "./world";
 
