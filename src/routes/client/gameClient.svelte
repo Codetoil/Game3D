@@ -5,54 +5,15 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { onMount } from "svelte"
+  import Game from "../game.svelte";
 import { PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 
-export class GameClient {
-  public ready: Promise<GameClient>;
-  public started: boolean;
-  public stopped: boolean;
-
-  public engine!: BABYLON.Engine;
+export class GameClient extends Game {
   public canvas!: HTMLCanvasElement;
-  public scene!: BABYLON.Scene;
 
-  public player!: PlayerClient;
   public camera!: BABYLON.ArcFollowCamera;
   public world!: WorldClient;
-
-  constructor() {
-    this.started = false;
-    this.stopped = false;
-    this.ready = new Promise((resolve, reject) => {
-      onMount(() => {
-        this.canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-        this.createEngine()
-          .then((engine) => {
-            if (!engine) reject(new Error("engine should not be null."));
-            this.createScene()
-              .then((scene) => {
-                if (!scene) reject(new Error("scene should not be null."));
-                resolve(this);
-              })
-              .catch(function (e) {
-                console.error("The available createScene function failed.");
-                console.error(e);
-                reject(e);
-              });
-          })
-          .catch((e) => {
-            console.error("The available createEngine function failed.");
-            console.error(e);
-            reject(e);
-          });
-        });
-      }).then(() => {
-        this.started = true;
-        console.info("Starting game...");
-        return this;
-      });
-  }
 
   public async createEngine(): Promise<BABYLON.Engine> {
     const webGPUSupported = await BABYLON.WebGPUEngine.IsSupportedAsync;
@@ -81,10 +42,9 @@ export class GameClient {
       this.scene
     );
     this.world = new WorldClient();
-    this.world.engine = this.engine;
     this.world.scene = this.scene;
     // Create the player entity
-    this.player = new Player(this.world)
+    this.world.player = new PlayerClient(this.world)
       .setMesh(
         BABYLON.MeshBuilder.CreateCapsule(
           "player",
@@ -101,7 +61,7 @@ export class GameClient {
       .setPositionAndRotation(
         new BABYLON.Vector3(5, -5, -10),
         BABYLON.Quaternion.Identity()
-      ) as Player;
+      ) as PlayerClient;
     this.player.mesh.material = new BABYLON.StandardMaterial(
       "playerMat",
       this.scene

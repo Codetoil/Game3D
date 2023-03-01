@@ -5,9 +5,11 @@
 import * as BABYLON from "@babylonjs/core";
 import { WallClient } from "../client/worldClient";
 import type { InputController } from "./inputController";
-import { Wall, World } from "./world";
+import { Ground, Wall, World } from "./world";
 
 export abstract class Entity {
+  public mesh: BABYLON.Mesh;
+
   public world: World;
 
   public pos: BABYLON.Vector3;
@@ -20,10 +22,14 @@ export abstract class Entity {
 
   public abstract gravity: number;
 
-  public constructor(world: World) {
-    this.world = world;
+  public constructor() {
     this.velH = new BABYLON.Vector3(0.0, 0.0, 0.0);
     this.vely = 0.0;
+  }
+
+  public setWorld(world: World): Entity {
+    this.world = world;
+    return this;
   }
 
   public setMesh(mesh: BABYLON.Mesh): Entity {
@@ -42,16 +48,16 @@ export abstract class Entity {
 
   protected checkCollisions() {
     this.onGround = this.world.grounds
-      .map((ground: BABYLON.Mesh) =>
-        this.mesh.intersectsMesh(ground, false)
-          ? this.mesh.intersectsMesh(ground, true)
+      .map((ground: Ground) =>
+        this.mesh.intersectsMesh(ground.mesh, false)
+          ? this.mesh.intersectsMesh(ground.mesh, true)
           : false
       )
       .reduce((p, c) => p || c, false);
     this.onWall = this.world.walls
-      .map((wall: BABYLON.Mesh) =>
-        this.mesh.intersectsMesh(wall, false)
-          ? this.mesh.intersectsMesh(wall, true)
+      .map((wall: Wall) =>
+        this.mesh.intersectsMesh(wall.mesh, false)
+          ? this.mesh.intersectsMesh(wall.mesh, true)
           : false
       )
       .reduce((p, c) => p || c, false);
@@ -72,9 +78,8 @@ export abstract class Player extends Entity {
     return -2.0;
   }
 
-  public constructor(world: World) {
-    super(world);
-    // this.inputController = new PlayerInputController(world.engine);
+  public constructor() {
+    super();
   }
 
   protected get hMovementScaleFactor() {
@@ -226,7 +231,7 @@ export abstract class Player extends Entity {
     console.assert(!!cameraAngle, "Camera angle cannot be undefined");
 
     this.checkCollisions();
-    this.inputController.tick();
+    this.inputController.tick(this, this.world);
     this.inputController.joystick.rotateByQuaternionToRef(cameraAngle, this.inputController.joystick);
     this.checkCollisions();
 

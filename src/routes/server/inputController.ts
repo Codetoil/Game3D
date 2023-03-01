@@ -1,7 +1,15 @@
+/**
+ * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ */
+
+import * as BABYLON from "@babylonjs/core";
+import { Entity } from "./entity";
+import { World } from "./world";
+
 export interface InputController {
   sprintHeld: boolean;
   jumpPressed: boolean;
   joystick: BABYLON.Vector3;
 
-  public tick();
+  tick(entity: Entity, world: World): void;
 }
