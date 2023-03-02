@@ -4,7 +4,6 @@
 
 import { serializer, fields } from 'serializers';
 
-export function packets()
-{
-    
+export function packets() {
+
 }

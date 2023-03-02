@@ -51,6 +51,7 @@ declare module '$env/static/private' {
 	export const GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 	export const SHLVL: string;
 	export const BROWSER: string;
+	export const npm_package_dependencies_nbt_ts: string;
 	export const HUGO_ROOT: string;
 	export const HOME: string;
 	export const OLDPWD: string;
@@ -241,6 +242,7 @@ declare module '$env/dynamic/private' {
 		GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 		SHLVL: string;
 		BROWSER: string;
+		npm_package_dependencies_nbt_ts: string;
 		HUGO_ROOT: string;
 		HOME: string;
 		OLDPWD: string;

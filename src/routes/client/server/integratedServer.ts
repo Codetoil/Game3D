@@ -5,7 +5,11 @@
 import { Server } from "../../server/server";
 
 export class IntegratedServer extends Server {
-    public init(): void {
-        
+    public init() {
+        super.init();
+    }
+
+    public tick() {
+        super.tick();
     }
 }

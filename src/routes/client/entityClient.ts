@@ -4,30 +4,36 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { Mixin } from "ts-mixer";
-import { Entity, Player } from "../server/entity";
-import type { InputController } from "../server/inputController";
-import { WorldServer } from "../server/worldServer";
 import { PlayerInputController } from "./clientInputController";
 import { WorldClient } from "./worldClient";
+import { Entity, Player } from "../common/entity";
 
 export abstract class EntityClient extends Entity {
-  public texture?: BABYLON.Texture;
-  public world!: WorldClient;
+    public texture?: BABYLON.Texture;
+    public world!: WorldClient;
+
+    public setWorld(world: WorldClient): EntityClient {
+        super.setWorld(world);
+        return this;
+    }
 }
 
-export class PlayerClient extends Mixin(Player, EntityClient) {
-  public world!: WorldClient;
-  public inputController: PlayerInputController;
+export class PlayerClient extends Mixin(EntityClient, Player) {
+    public world!: WorldClient;
+    public inputController: PlayerInputController;
 
-  public constructor()
-  {
-    super();
-    this.inputController = new PlayerInputController();
-  }
+    public constructor() {
+        super();
+        this.inputController = new PlayerInputController();
+    }
 
-  public setWorld(world: WorldServer): PlayerClient {
-      super.setWorld(world);
-      this.inputController.setEngine(this.world.scene.getEngine());
-      return this;
-  }
+    public setWorld(world: WorldClient): PlayerClient {
+        super.setWorld(world);
+        this.inputController.setEngine(this.world.scene.getEngine());
+        return this;
+    }
+
+    protected checkCollisions(): void {
+        // No collision check on client
+    }
 }

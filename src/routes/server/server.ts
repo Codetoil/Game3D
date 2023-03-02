@@ -7,7 +7,9 @@ import { WorldServer } from "./worldServer";
 export abstract class Server {
     public world!: WorldServer;
 
-    public abstract init(): void;
+    public init() {
+
+    }
 
     public tick() {
         this.world.tick();
