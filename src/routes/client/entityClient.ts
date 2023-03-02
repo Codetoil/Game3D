@@ -6,7 +6,7 @@ import * as BABYLON from "@babylonjs/core";
 import { Mixin } from "ts-mixer";
 import { Entity, Player } from "../server/entity";
 import type { InputController } from "../server/inputController";
-import { World } from "../server/world";
+import { WorldServer } from "../server/worldServer";
 import { PlayerInputController } from "./clientInputController";
 import { WorldClient } from "./worldClient";
 
@@ -25,7 +25,7 @@ export class PlayerClient extends Mixin(Player, EntityClient) {
     this.inputController = new PlayerInputController();
   }
 
-  public setWorld(world: World): PlayerClient {
+  public setWorld(world: WorldServer): PlayerClient {
       super.setWorld(world);
       this.inputController.setEngine(this.world.scene.getEngine());
       return this;

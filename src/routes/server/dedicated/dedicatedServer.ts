@@ -6,5 +6,7 @@ import { Server } from "../server";
 
 export class DedicatedServer extends Server
 {
-    
+    public init(): void {
+
+    }
 }

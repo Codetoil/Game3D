@@ -1175,6 +1175,11 @@ ignore@^5.2.0:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.4.tgz#a291c0c6178ff1b960befe47fcdec301674a6324"
   integrity sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==
 
+immuton@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/immuton/-/immuton-2.0.0.tgz#14f0f8c1413943ce0e1b5a599ab55766de0032f2"
+  integrity sha512-cTTPkDBJfIP1wSTMt3ZAEZtBOOH2bYKZMxAvmjQ1M87pmunCnnoNLhCgEtnAHlAHC7YC8yxComVTd1aiTJ264A==
+
 import-fresh@^3.0.0, import-fresh@^3.2.1:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-3.3.0.tgz#37162c25fcb9ebaa2e6e53d5b4d88ce17d9e0c2b"
@@ -1686,6 +1691,13 @@ semver@^7.3.7:
   integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
   dependencies:
     lru-cache "^6.0.0"
+
+serializers@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/serializers/-/serializers-0.1.1.tgz#67ea4b40259f788564f2b0605b126c88f680e151"
+  integrity sha512-rWCdOhYh9T+bWVqXnLfj0mAKtGK5KF9e++jppw1x7sZQfuVWvEOgW9SZOFEwUbOTFE5T3QIxNiXoOm51X/pZ2Q==
+  dependencies:
+    immuton "^2.0.0"
 
 set-cookie-parser@^2.5.1:
   version "2.5.1"

@@ -5,5 +5,7 @@
 import { Server } from "../../server/server";
 
 export class IntegratedServer extends Server {
-    
+    public init(): void {
+        
+    }
 }

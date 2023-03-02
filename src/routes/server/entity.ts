@@ -5,12 +5,12 @@
 import * as BABYLON from "@babylonjs/core";
 import { Quaternion } from "@babylonjs/core";
 import type { InputController } from "./inputController";
-import { Ground, Wall, World } from "./world";
+import { GroundServer, WallServer, WorldServer } from "./worldServer";
 
 export abstract class Entity {
   public mesh!: BABYLON.Mesh;
 
-  public world!: World;
+  public world!: WorldServer;
 
   public pos!: BABYLON.Vector3;
   public velH: BABYLON.Vector3 = new BABYLON.Vector3(0.0, 0.0, 0.0);
@@ -22,7 +22,7 @@ export abstract class Entity {
 
   public abstract gravity: number;
 
-  public setWorld(world: World): Entity {
+  public setWorld(world: WorldServer): Entity {
     this.world = world;
     return this;
   }
@@ -43,14 +43,14 @@ export abstract class Entity {
 
   protected checkCollisions() {
     this.onGround = this.world.grounds
-      .map((ground: Ground) =>
+      .map((ground: GroundServer) =>
         this.mesh.intersectsMesh(ground.mesh, false)
           ? this.mesh.intersectsMesh(ground.mesh, true)
           : false
       )
       .reduce((p, c) => p || c, false);
     this.onWall = this.world.walls
-      .map((wall: Wall) =>
+      .map((wall: WallServer) =>
         this.mesh.intersectsMesh(wall.mesh, false)
           ? this.mesh.intersectsMesh(wall.mesh, true)
           : false
@@ -62,7 +62,7 @@ export abstract class Entity {
 export abstract class Player extends Entity {
   public maxHSpeed: number = -1.0;
   public canWallJump = true;
-  public lastWallWallJumpedFrom: BABYLON.Nullable<Wall> = null;
+  public lastWallWallJumpedFrom: BABYLON.Nullable<WallServer> = null;
   public jumpState = false;
   public inputController!: InputController;
   public facingDirection: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 1).normalize();

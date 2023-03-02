@@ -3,37 +3,17 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
+import { Wall, Ground, AbstractWorld } from "../common/world";
 
-export class Ground {
-  public mesh!: BABYLON.AbstractMesh;
-
-
-  public setMesh(mesh: BABYLON.AbstractMesh): Ground {
-    this.mesh = mesh;
-    return this;
+export class WorldServer extends AbstractWorld {
+  public load() {
+    this.read();
   }
-}
 
-export class Wall {
-  public mesh!: BABYLON.AbstractMesh;
-
-  public setMesh(mesh: BABYLON.AbstractMesh): Wall {
-    this.mesh = mesh;
-    return this;
-  }
-}
-
-export abstract class World {
-  public scene!: BABYLON.Scene;
-  public grounds!: Ground[];
-  public walls!: Wall[];
-
-  public initialize() {
+  public read() {
     this.grounds = [];
     this.walls = [];
 
-
-    /*var ceilings = [];*/
     //Ground
     var ground: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
       "ground",
@@ -46,12 +26,6 @@ export abstract class World {
     ground.material.backFaceCulling = false;
     ground.position = new BABYLON.Vector3(5, -10, -15);
     ground.rotation = new BABYLON.Vector3(0, 0, 0);
-    /*ground.physicsImpostor = new BABYLON.PhysicsImpostor(
-      ground,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, friction: 1 },
-      scene
-    );*/
     this.grounds.push(new Ground().setMesh(ground));
 
     var wall: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
@@ -65,12 +39,6 @@ export abstract class World {
     wall.material.backFaceCulling = false;
     wall.position = new BABYLON.Vector3(3.2, -2.5, -15);
     wall.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-    /*wall.physicsImpostor = new BABYLON.PhysicsImpostor(
-      wall,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, friction: 10 },
-      scene
-    );*/
     this.walls.push(new Wall().setMesh(wall));
 
     var wall2: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
@@ -81,13 +49,6 @@ export abstract class World {
     wall2.material = wall.material;
     wall2.position = new BABYLON.Vector3(6.8, -2.5, -15);
     wall2.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-    /*wall2.physicsImpostor = new BABYLON.PhysicsImpostor(
-      wall2,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, friction: 10 },
-      scene
-    );*/
-    //wall2.setEnabled(false);
     this.walls.push(new Wall().setMesh(wall2));
 
     var platform = BABYLON.MeshBuilder.CreateBox(
@@ -97,12 +58,6 @@ export abstract class World {
     );
     platform.material = wall.material;
     platform.position = new BABYLON.Vector3(17, -10, -10);
-    /*platform.physicsImpostor = new BABYLON.PhysicsImpostor(
-      platform,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0 },
-      scene
-    );*/
     this.grounds.push(new Ground().setMesh(platform));
 
     var dbox = BABYLON.MeshBuilder.CreateBox(
@@ -118,5 +73,12 @@ export abstract class World {
     dbox.setEnabled(false);
   }
 
-  public tick() {}
+  public write()
+  {
+    
+  }
+
+  public tick() {
+
+  }
 }

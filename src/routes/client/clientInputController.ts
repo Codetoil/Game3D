@@ -5,7 +5,7 @@
 import * as BABYLON from "@babylonjs/core";
 import { Entity } from "../server/entity";
 import type { InputController } from "../server/inputController";
-import { World } from "../server/world";
+import { WorldServer } from "../server/worldServer";
 import { EntityClient, PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 
@@ -26,7 +26,7 @@ export class PlayerInputController implements InputController {
     }
   }
 
-  public tick(entity: Entity, world: World) {
+  public tick(entity: Entity, world: WorldServer) {
     if (!(entity instanceof PlayerClient)) {
       throw new Error("Entity is not a client player.");
     }
