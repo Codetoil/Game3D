@@ -51,7 +51,7 @@ declare module '$env/static/private' {
 	export const GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 	export const SHLVL: string;
 	export const BROWSER: string;
-	export const npm_package_dependencies_nbt_ts: string;
+	export const npm_package_devDependencies__types_express: string;
 	export const HUGO_ROOT: string;
 	export const HOME: string;
 	export const OLDPWD: string;
@@ -89,7 +89,6 @@ declare module '$env/static/private' {
 	export const NVM_DIR: string;
 	export const npm_package_readmeFilename: string;
 	export const DOTNET_SKIP_FIRST_TIME_EXPERIENCE: string;
-	export const npm_package_devDependencies_prettier: string;
 	export const npm_package_devDependencies__playwright_test: string;
 	export const npm_package_scripts_dev: string;
 	export const ContainerVersion: string;
@@ -107,7 +106,6 @@ declare module '$env/static/private' {
 	export const IRBRC: string;
 	export const npm_package_dependencies_xss: string;
 	export const npm_package_devDependencies__typescript_eslint_eslint_plugin: string;
-	export const npm_package_scripts_lint: string;
 	export const npm_config_registry: string;
 	export const TERM: string;
 	export const DOTNET_ROOT: string;
@@ -127,6 +125,7 @@ declare module '$env/static/private' {
 	export const npm_package_scripts_test_unit: string;
 	export const LANG: string;
 	export const npm_package_devDependencies_eslint: string;
+	export const npm_package_devDependencies__mankins_svelte_adapter_express: string;
 	export const LS_COLORS: string;
 	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const SDKMAN_DIR: string;
@@ -159,7 +158,6 @@ declare module '$env/static/private' {
 	export const npm_config_strict_ssl: string;
 	export const DEBIAN_FLAVOR: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
-	export const npm_package_scripts_format: string;
 	export const JAVA_HOME: string;
 	export const NVS_USE_XZ: string;
 	export const PWD: string;
@@ -179,7 +177,6 @@ declare module '$env/static/private' {
 	export const PHP_PATH: string;
 	export const RAILS_DEVELOPMENT_HOSTS: string;
 	export const CODESPACE_VSCODE_FOLDER: string;
-	export const npm_package_devDependencies_prettier_plugin_svelte: string;
 	export const npm_package_scripts_preview: string;
 	export const MAVEN_ROOT: string;
 	export const RUBY_HOME: string;
@@ -242,7 +239,7 @@ declare module '$env/dynamic/private' {
 		GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 		SHLVL: string;
 		BROWSER: string;
-		npm_package_dependencies_nbt_ts: string;
+		npm_package_devDependencies__types_express: string;
 		HUGO_ROOT: string;
 		HOME: string;
 		OLDPWD: string;
@@ -280,7 +277,6 @@ declare module '$env/dynamic/private' {
 		NVM_DIR: string;
 		npm_package_readmeFilename: string;
 		DOTNET_SKIP_FIRST_TIME_EXPERIENCE: string;
-		npm_package_devDependencies_prettier: string;
 		npm_package_devDependencies__playwright_test: string;
 		npm_package_scripts_dev: string;
 		ContainerVersion: string;
@@ -298,7 +294,6 @@ declare module '$env/dynamic/private' {
 		IRBRC: string;
 		npm_package_dependencies_xss: string;
 		npm_package_devDependencies__typescript_eslint_eslint_plugin: string;
-		npm_package_scripts_lint: string;
 		npm_config_registry: string;
 		TERM: string;
 		DOTNET_ROOT: string;
@@ -318,6 +313,7 @@ declare module '$env/dynamic/private' {
 		npm_package_scripts_test_unit: string;
 		LANG: string;
 		npm_package_devDependencies_eslint: string;
+		npm_package_devDependencies__mankins_svelte_adapter_express: string;
 		LS_COLORS: string;
 		VSCODE_GIT_IPC_HANDLE: string;
 		SDKMAN_DIR: string;
@@ -350,7 +346,6 @@ declare module '$env/dynamic/private' {
 		npm_config_strict_ssl: string;
 		DEBIAN_FLAVOR: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
-		npm_package_scripts_format: string;
 		JAVA_HOME: string;
 		NVS_USE_XZ: string;
 		PWD: string;
@@ -370,7 +365,6 @@ declare module '$env/dynamic/private' {
 		PHP_PATH: string;
 		RAILS_DEVELOPMENT_HOSTS: string;
 		CODESPACE_VSCODE_FOLDER: string;
-		npm_package_devDependencies_prettier_plugin_svelte: string;
 		npm_package_scripts_preview: string;
 		MAVEN_ROOT: string;
 		RUBY_HOME: string;

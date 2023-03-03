@@ -5,9 +5,6 @@
 import * as BABYLON from "@babylonjs/core";
 
 export abstract class Game {
-    public ready: Promise<Game> = new Promise((resolve, reject) => {
-        return this.init(resolve, reject);
-    });
     public started: boolean = false;
     public stopped: boolean = false;
 

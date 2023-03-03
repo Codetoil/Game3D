@@ -3,6 +3,7 @@
 -->
 <script lang="ts">
   import * as BABYLON from "@babylonjs/core";
+	import * as DEVALUE from 'devalue';
   import { onMount } from "svelte";
   import { Game } from "../game";
   import { WorldClient } from "./worldClient";
@@ -70,6 +71,18 @@
       this.clientWorld.scene = new BABYLON.Scene(this.engine);
 
       this.clientWorld.load();
+
+      console.log(
+        DEVALUE.stringify(
+          {
+            id: 0,
+            version: 1,
+            address: "localhost",
+            port: 48859,
+            nextState: 2,
+          }
+        )
+      );
 
       this.clientWorld.scene.onBeforeRenderObservable.add(
         this.beforeRender.bind(null, this)
