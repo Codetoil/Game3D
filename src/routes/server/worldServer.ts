@@ -8,6 +8,7 @@ import { Wall, Ground, World } from "../common/world";
 export class WorldServer extends World {
     public load() {
         this.read();
+        this.send();
     }
 
     public read() {
@@ -73,7 +74,7 @@ export class WorldServer extends World {
         dbox.setEnabled(false);
     }
 
-    public write() {
+    public send() {
 
     }
 

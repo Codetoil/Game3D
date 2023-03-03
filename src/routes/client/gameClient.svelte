@@ -5,7 +5,6 @@
   import * as BABYLON from "@babylonjs/core";
   import { onMount } from "svelte";
   import { Game } from "../game";
-  import { PlayerClient } from "./entityClient";
   import { WorldClient } from "./worldClient";
 
   export class GameClient extends Game {
@@ -14,8 +13,7 @@
     });
     public canvas!: HTMLCanvasElement;
 
-    public camera!: BABYLON.ArcFollowCamera;
-    public world!: WorldClient;
+    public clientWorld!: WorldClient;
 
     public init(
       resolve: (value: GameClient | PromiseLike<GameClient>) => void,
@@ -68,89 +66,21 @@
     }
 
     public async createScene(): Promise<BABYLON.Scene> {
-      this.world = new WorldClient();
-      this.world.scene = new BABYLON.Scene(this.engine);
-      // Lights
-      var _lightHemi: BABYLON.Light = new BABYLON.HemisphericLight(
-        "hemi",
-        new BABYLON.Vector3(0, 1, 0),
-        this.world.scene
-      );
-      // Create the player entity
-      this.world.player = new PlayerClient()
-        .setWorld(this.world)
-        .setMesh(
-          BABYLON.MeshBuilder.CreateCapsule(
-            "player",
-            {
-              radius: 0.75,
-              height: 3,
-              subdivisions: 10,
-              tessellation: 10,
-              capSubdivisions: 10,
-            },
-            this.world.scene
-          )
-        )
-        .setPositionAndRotation(
-          new BABYLON.Vector3(5, -5, -10),
-          BABYLON.Quaternion.Identity()
-        ) as PlayerClient;
-      this.world.player.mesh.material = new BABYLON.StandardMaterial(
-        "playerMat",
-        this.world.scene
-      );
+      this.clientWorld = new WorldClient();
+      this.clientWorld.scene = new BABYLON.Scene(this.engine);
 
-      this.world.player.texture = new BABYLON.Texture(
-        "%sveltekit.assets%/temp_player.png",
-        this.world.scene
-      );
-      (
-        this.world.player.mesh.material as BABYLON.StandardMaterial
-      ).diffuseTexture = this.world.player.texture;
-      this.world.player.texture.hasAlpha = true;
-      this.world.player.onGround = true;
+      this.clientWorld.load();
 
-      this.camera = new BABYLON.ArcFollowCamera(
-        "camera",
-        Math.PI / 2,
-        0.5,
-        10,
-        this.world.player.mesh,
-        this.world.scene
-      );
-      this.camera.orthoBottom = -10;
-      this.camera.orthoLeft = -10;
-      this.camera.orthoRight = 10;
-      this.camera.orthoTop = 10;
-      // this.camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-      if (this.camera.mode === BABYLON.Camera.ORTHOGRAPHIC_CAMERA) {
-        this.camera.rotationQuaternion = new BABYLON.Vector3(
-          Math.PI / 2,
-          0.0,
-          0.0
-        ).toQuaternion();
-      } else {
-        this.camera.rotationQuaternion = new BABYLON.Vector3(
-          Math.PI / 2,
-          0,
-          0.25
-        ).toQuaternion();
-      }
-
-      this.world.load();
-
-      this.world.scene.onBeforeRenderObservable.add(
+      this.clientWorld.scene.onBeforeRenderObservable.add(
         this.beforeRender.bind(null, this)
       );
 
-      return this.world.scene;
+      return this.clientWorld.scene;
     }
 
     private beforeRender(gameClient: GameClient) {
       if (!gameClient.started || gameClient.stopped) return;
-      gameClient.world.tick();
-      // gameClient.world.player.tick(gameClient.camera.rotationQuaternion);
+      gameClient.clientWorld.tick();
     }
   }
 
@@ -169,11 +99,11 @@
       if (
         value.started &&
         !value.stopped &&
-        value.world.scene &&
-        value.world.scene.activeCamera
+        value.clientWorld.scene &&
+        value.clientWorld.scene.activeCamera
       ) {
         try {
-          value.world.scene.render();
+          value.clientWorld.scene.render();
         } catch (e: any) {
           console.error(e);
           value.stopped = true;

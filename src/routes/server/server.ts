@@ -8,7 +8,8 @@ export abstract class Server {
     public world!: WorldServer;
 
     public init() {
-
+        this.world = new WorldServer();
+        this.world.load();
     }
 
     public tick() {
