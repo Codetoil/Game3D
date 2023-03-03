@@ -5,7 +5,8 @@
 import { serializer, fields } from 'serializers';
 
 export const handshakePacket = serializer({
-    version: fields.constant(Array.from({length:1},(_v,k)=>k+1)),
+    id: fields.constant([0]),
+    version: fields.constant(Array.from({length:1},(_v,k)=>k+1).map(v => v - 1)),
     address: fields.string(1, 255, false),
     port: fields.integer({
         min: 0,
