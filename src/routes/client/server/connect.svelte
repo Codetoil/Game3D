@@ -1,3 +1,7 @@
+<!-- 
+    ALL RIGHTS RESERVED Codetoil (c) 2021-2023 
+-->
+
 <script lang="ts">
     export let worker: SharedWorker | null = null;
 
