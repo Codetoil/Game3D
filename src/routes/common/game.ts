@@ -3,17 +3,18 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
+import { World } from "./world";
 
 export abstract class Game {
+    public abstract name: string;
+    public world!: World;
+    public engine!: BABYLON.Engine;
     public started: boolean = false;
     public stopped: boolean = false;
-
-    public engine!: BABYLON.Engine;
-
     public abstract createEngine(): Promise<BABYLON.Engine>;
     public abstract createScene(): Promise<BABYLON.Scene>;
 
-    public init(resolve: (value: Game | PromiseLike<Game>) => void, reject: (reason?: any) => void): Game {
+    public init(resolve: (value: Game | PromiseLike<Game>) => void, reject: (reason?: any) => void) {
         this.createEngine()
             .then((engine) => {
                 if (!engine) reject(new Error("engine should not be null."));
@@ -34,10 +35,15 @@ export abstract class Game {
                 reject(e);
             }).then(
                 () => {
-                    this.started = true;
-                    console.info("Starting game...");
+                    this.started = true
+                    console.info("Starting " + this.name + "...");
+                    this.world.load(this.engine)
                 }
             );
-        return this;
+    }
+
+    public tick() {
+        if (!this.started || this.stopped) return;
+        this.world.tick();
     }
 }

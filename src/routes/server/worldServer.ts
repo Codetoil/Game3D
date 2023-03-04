@@ -6,12 +6,13 @@ import * as BABYLON from "@babylonjs/core";
 import { Wall, Ground, World } from "../common/world";
 
 export class WorldServer extends World {
-    public load() {
-        this.read();
+    public load(engine: BABYLON.Engine) {
+        this.read(engine);
         this.send();
     }
 
-    public read() {
+    public read(engine: BABYLON.Engine) {
+        this.scene = new BABYLON.Scene(engine);
         this.grounds = [];
         this.walls = [];
 

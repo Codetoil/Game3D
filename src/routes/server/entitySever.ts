@@ -9,8 +9,6 @@ import { WorldServer } from "./worldServer";
 import { Mixin } from "ts-mixer";
 
 export abstract class EntityServer extends Entity {
-    public world!: WorldServer;
-
     public setWorld(world: WorldServer): EntityServer {
         this.world = world;
         return this;

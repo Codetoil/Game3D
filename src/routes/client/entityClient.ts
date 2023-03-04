@@ -10,7 +10,6 @@ import { Entity, Player } from "../common/entity";
 
 export abstract class EntityClient extends Entity {
     public texture?: BABYLON.Texture;
-    public world!: WorldClient;
 
     public setWorld(world: WorldClient): EntityClient {
         super.setWorld(world);
@@ -19,7 +18,6 @@ export abstract class EntityClient extends Entity {
 }
 
 export class PlayerClient extends Mixin(EntityClient, Player) {
-    public world!: WorldClient;
     public inputController: PlayerInputController;
 
     public constructor() {

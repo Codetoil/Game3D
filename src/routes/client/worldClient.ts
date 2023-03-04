@@ -8,10 +8,11 @@ import { World } from "../common/world";
 
 export class WorldClient extends World {
     public camera!: BABYLON.ArcFollowCamera;
-
     public player!: PlayerClient;
 
-    public load(): void {
+    public load(engine: BABYLON.Engine): void {
+        this.scene = new BABYLON.Scene(engine);
+
         // Lights
         var _lightHemi: BABYLON.Light = new BABYLON.HemisphericLight(
             "hemi",
@@ -78,6 +79,7 @@ export class WorldClient extends World {
                 0.25
             ).toQuaternion();
         }
+
     }
 
     public tick() { }

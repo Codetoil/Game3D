@@ -27,6 +27,6 @@ export abstract class World {
     public grounds!: Ground[];
     public walls!: Wall[];
 
-    public abstract load(): void;
+    public abstract load(engine: BABYLON.Engine): void;
     public abstract tick(): void;
 }

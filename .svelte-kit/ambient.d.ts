@@ -35,6 +35,7 @@ declare module '$env/static/private' {
 	export const PYTHONIOENCODING: string;
 	export const npm_package_devDependencies_vitest: string;
 	export const USER: string;
+	export const npm_package_devDependencies_eslint_plugin_security: string;
 	export const npm_config_version_commit_hooks: string;
 	export const npm_config_user_agent: string;
 	export const NVS_ROOT: string;
@@ -51,7 +52,6 @@ declare module '$env/static/private' {
 	export const GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 	export const SHLVL: string;
 	export const BROWSER: string;
-	export const npm_package_devDependencies__types_express: string;
 	export const HUGO_ROOT: string;
 	export const HOME: string;
 	export const OLDPWD: string;
@@ -223,6 +223,7 @@ declare module '$env/dynamic/private' {
 		PYTHONIOENCODING: string;
 		npm_package_devDependencies_vitest: string;
 		USER: string;
+		npm_package_devDependencies_eslint_plugin_security: string;
 		npm_config_version_commit_hooks: string;
 		npm_config_user_agent: string;
 		NVS_ROOT: string;
@@ -239,7 +240,6 @@ declare module '$env/dynamic/private' {
 		GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: string;
 		SHLVL: string;
 		BROWSER: string;
-		npm_package_devDependencies__types_express: string;
 		HUGO_ROOT: string;
 		HOME: string;
 		OLDPWD: string;

@@ -3,12 +3,13 @@
 -->
 <script lang="ts">
   import * as BABYLON from "@babylonjs/core";
-	import * as DEVALUE from 'devalue';
+  import * as DEVALUE from "devalue";
   import { onMount } from "svelte";
-  import { Game } from "../game";
+  import { Game } from "../common/game";
   import { WorldClient } from "./worldClient";
 
   export class GameClient extends Game {
+    public name: string = "Game";
     public ready: Promise<GameClient> = new Promise((resolve, reject) => {
       onMount(() => this.init(resolve, reject));
     });
@@ -19,14 +20,11 @@
     public init(
       resolve: (value: GameClient | PromiseLike<GameClient>) => void,
       reject: (reason?: any) => void
-    ): GameClient {
+    ) {
       this.canvas = document.getElementById(
         "renderCanvas"
       ) as HTMLCanvasElement;
-      return super.init(
-        (oldArgs) => resolve(this.convertFromValue(oldArgs)),
-        reject
-      ) as GameClient;
+      super.init((oldArgs) => resolve(this.convertFromValue(oldArgs)), reject);
     }
 
     private convertFromValue(
@@ -68,20 +66,16 @@
 
     public async createScene(): Promise<BABYLON.Scene> {
       this.clientWorld = new WorldClient();
-      this.clientWorld.scene = new BABYLON.Scene(this.engine);
-
-      this.clientWorld.load();
+      this.clientWorld.load(this.engine);
 
       console.log(
-        DEVALUE.stringify(
-          {
-            id: 0,
-            version: 1,
-            address: "localhost",
-            port: 48859,
-            nextState: 2,
-          }
-        )
+        DEVALUE.stringify({
+          id: 0,
+          version: 1,
+          address: "localhost",
+          port: 48859,
+          nextState: 2,
+        })
       );
 
       this.clientWorld.scene.onBeforeRenderObservable.add(
