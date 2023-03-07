@@ -16,11 +16,9 @@ import { EventLogger } from "./debug/eventLogger";
 // @ts-ignore
 let sw = self;
 
+let oldconsole = console;
 let eventLogger = console = new EventLogger(console);
-/**
- * @type {((this: MessagePort, ev: MessageEvent<any>) => any)[]}
- */
-let listeners = [];
+let portNumber = 0;
 
 sw.onerror = (evt) => {
     eventLogger.ports.forEach(port => {
@@ -30,29 +28,25 @@ sw.onerror = (evt) => {
 
 sw.onconnect = (evt) => {
     eventLogger.ports = evt.ports;
+    portNumber++;
 
     evt.ports.forEach(port => {
         port.onmessage = (ev) => {
             if (typeof ev.data == 'string' && ev.data === 'disconnect'
-            && ev.currentTarget instanceof MessagePort) {
+            && ev.currentTarget != null && ev.currentTarget instanceof MessagePort) {
                 ev.currentTarget.postMessage("disconnect")
                 ev.currentTarget?.close();
-                if (currentlyActiveClients().length == 0) {
-                    self.close();
+                portNumber--;
+                if (portNumber == 0) {
+                    sw.close();
                 }
             };
         }
-        port.onmessageerror = (_ev) => {
+        port.onmessageerror = (ev) => {
+            oldconsole.error(ev)
             self.close();
         }
 
         port.start(); // Required when using addEventListener. Otherwise called implicitly by onmessage setter.
     });
 };
-
-/**
- * @returns {Array<MessagePort>}
- */
-function currentlyActiveClients() {
-    throw new Error("Function not implemented.");
-}
