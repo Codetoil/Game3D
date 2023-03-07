@@ -170,6 +170,7 @@ export class NewConsole implements Console {
   }
 
   public clear(): void {
+    logText = "";
     this.oldConsole.clear();
   }
   public debug(message?: string, ...optionalParams: any[]): void {
@@ -257,6 +258,8 @@ export class NewConsole implements Console {
   }
 }
 console = new NewConsole(console) as Console; // Monkey Patch the Console Replacement in.
+let consolenew = console;
 </script>
 
+<button on:click={consolenew.clear}>Clear console</button><br>
 <p id="log">{@html logText}</p>

@@ -3,24 +3,27 @@
 -->
 
 <script lang="ts">
+  import xss from "xss";
+    import ServerWorker from "./shared-worker.js?sharedworker";
+
     export let worker: SharedWorker | null = null;
 
     export function connectToLocal() {
         console.info("Connecting to local server")
-        worker = new SharedWorker("src/routes/client/server/shared-worker.js", {
-            name: "Server Thread"
-        });
-        worker.addEventListener('error', (evt) => console.error(evt.error));
-        worker.port.addEventListener("message", (ev: MessageEvent) => {
-            console.info("Event Data: " + ev.data);
+        worker = new ServerWorker();
+        worker.onerror = (evt) => console.error(evt.error);
+        worker.port.onmessage = (ev: MessageEvent) => {
+            console.debug("Recieved: " + xss("" + ev.data));
             if (typeof ev.data === 'string' && ev.data === "disconnect")
             {
-                console.info("Disconnected from server");
+                console.info("Disconnecting from server");
+                worker?.port.close();
+                worker = null;
             }
-        });
-        worker.port.addEventListener("messageerror", (ev: MessageEvent) => {
+        };
+        worker.port.onmessageerror = (ev: MessageEvent) => {
             console.error("Failed to send message: " + ev.data);
-        });
+        };
         worker.port.start();
     }
 
@@ -35,14 +38,22 @@
     }
 
     export function disconnect() {
-        console.info("Disconnecting from server")
-        console.info(worker)
-        console.info(worker?.port)
+        console.info("Requesting to disconnect from server")
         if (!!worker) {
             worker.port.postMessage('disconnect');
         }
+    }
+
+    export function forceDisconnect() {
+        console.info("Forcefully disconnecting from server")
+        if (!!worker) {
+            worker.port.postMessage('disconnect');
+            worker.port.close();
+        }
+        worker = null;
     }
 </script>
 
 <button on:click="{connectToLocal}">Connect to Server</button>
 <button on:click="{disconnect}">Disconnect from Server</button>
+<button on:click="{forceDisconnect}">Forcefully Disconnect from Server</button>

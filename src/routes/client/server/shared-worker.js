@@ -7,36 +7,52 @@
 /// <reference lib="es2020" />
 /// <reference lib="webworker" />
 
-import { GameServer } from "../../server/dedicated/server";
 import "./debug/eventLogger"
 import { EventLogger } from "./debug/eventLogger";
 
-let gameServer = new GameServer();
-let eventLogger = new EventLogger(console);
+/**
+ * @type {SharedWorkerGlobalScope}
+ */
+// @ts-ignore
+let sw = self;
+
+let eventLogger = console = new EventLogger(console);
 /**
  * @type {((this: MessagePort, ev: MessageEvent<any>) => any)[]}
  */
 let listeners = [];
 
-addEventListener('connect', (evt) => {
-    if (!(evt instanceof MessageEvent)) return;
+sw.onerror = (evt) => {
+    eventLogger.ports.forEach(port => {
+        console.error("Error: " + evt);
+    })
+}
+
+sw.onconnect = (evt) => {
     eventLogger.ports = evt.ports;
 
-    evt.ports.forEach(port => listeners.forEach(listener => port.removeEventListener('message', listener)))
-
     evt.ports.forEach(port => {
-        let listener = (/** @type {MessageEvent<any>} */ ev) => {
-            if (typeof ev.data == 'string' && ev.data === 'disconnect') {
-                ev.ports[0].close();
-                if (evt.ports.length == 0)
-                {
+        port.onmessage = (ev) => {
+            if (typeof ev.data == 'string' && ev.data === 'disconnect'
+            && ev.currentTarget instanceof MessagePort) {
+                ev.currentTarget.postMessage("disconnect")
+                ev.currentTarget?.close();
+                if (currentlyActiveClients().length == 0) {
                     self.close();
                 }
             };
         }
-        listeners.push(listener);
-        port.addEventListener('message', listener);
+        port.onmessageerror = (_ev) => {
+            self.close();
+        }
 
         port.start(); // Required when using addEventListener. Otherwise called implicitly by onmessage setter.
     });
-})
+};
+
+/**
+ * @returns {Array<MessagePort>}
+ */
+function currentlyActiveClients() {
+    throw new Error("Function not implemented.");
+}
