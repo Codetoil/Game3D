@@ -3,7 +3,7 @@
 -->
 <script lang="ts">
   import xss from "xss";
-  import ServerWorker from "./shared-worker.js?sharedworker";
+  import ServerWorker from "./server-worker.js?sharedworker";
 
   export let worker: SharedWorker | null = null;
 

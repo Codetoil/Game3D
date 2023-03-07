@@ -2,9 +2,6 @@
 	"/": [
 		"src/routes/+page.ts"
 	],
-	"/client/server/debug": [
-		"src/routes/client/server/debug/+page.ts"
-	],
 	"/server/dedicated": [
 		"src/routes/server/dedicated/+page.server.ts"
 	]

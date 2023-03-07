@@ -7,8 +7,8 @@
 /// <reference lib="es2020" />
 /// <reference lib="webworker" />
 
-import "./debug/eventLogger"
-import { EventLogger } from "./debug/eventLogger";
+import "./eventLogger"
+import { EventLogger } from "./eventLogger";
 
 /**
  * @type {SharedWorkerGlobalScope}
