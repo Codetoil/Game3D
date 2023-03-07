@@ -68,16 +68,6 @@
       this.clientWorld = new WorldClient();
       this.clientWorld.load(this.engine);
 
-      console.log(
-        DEVALUE.stringify({
-          id: 0,
-          version: 1,
-          address: "localhost",
-          port: 48859,
-          nextState: 2,
-        })
-      );
-
       this.clientWorld.scene.onBeforeRenderObservable.add(
         this.beforeRender.bind(null, this)
       );

@@ -8,17 +8,16 @@ interface FormatSpecifierSearcher {
     specifierEnd: number;
 }
 
-export class NewConsole implements Console {
+export class EventLogger implements Console {
     private oldConsole: Console;
-    private port: MessagePort;
+    public ports!: readonly MessagePort[];
 
     public get Console(): console.ConsoleConstructor {
-        throw new Error("Do not use, use `new NewConsole()`, instead");
+        throw new Error("Do not use, use `new EventLogger()`, instead");
     }
 
-    constructor(oldConsole: Console, port: MessagePort) {
+    constructor(oldConsole: Console) {
         this.oldConsole = oldConsole;
-        this.port = port;
     }
 
     private hasFormatSpecifiers(formatString: string): boolean {
@@ -54,7 +53,7 @@ export class NewConsole implements Console {
             ""
         );
 
-        this.port.postMessage("log" + "[" + logLevel + "] " + argsStr);
+        this.ports.forEach(port => port.postMessage("log" + "[" + logLevel + "] " + argsStr));
     }
 
     private formatter(args: any[]): any[] {

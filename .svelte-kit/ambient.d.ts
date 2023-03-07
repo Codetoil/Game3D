@@ -140,7 +140,6 @@ declare module '$env/static/private' {
 	export const SHELL: string;
 	export const GOPATH: string;
 	export const npm_lifecycle_event: string;
-	export const npm_package_dependencies_jquery: string;
 	export const npm_package_version: string;
 	export const rvm_prefix: string;
 	export const npm_config_argv: string;
@@ -197,7 +196,7 @@ declare module '$env/static/private' {
  * ```
  */
 declare module '$env/static/public' {
-
+	
 }
 
 /**
@@ -328,7 +327,6 @@ declare module '$env/dynamic/private' {
 		SHELL: string;
 		GOPATH: string;
 		npm_lifecycle_event: string;
-		npm_package_dependencies_jquery: string;
 		npm_package_version: string;
 		rvm_prefix: string;
 		npm_config_argv: string;
