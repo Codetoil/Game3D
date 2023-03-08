@@ -7,8 +7,7 @@
 /// <reference lib="es2020" />
 /// <reference lib="webworker" />
 
-import "./eventLogger"
-import { EventLogger } from "./eventLogger";
+import EventLogger from "./eventLogger";
 
 /**
  * @type {SharedWorkerGlobalScope}
@@ -18,7 +17,7 @@ let sw = self;
 
 let oldconsole = console;
 let eventLogger = console = new EventLogger(console);
-let portNumber = 0;
+let portAmount = 0;
 
 sw.onerror = (evt) => {
     eventLogger.ports.forEach(port => {
@@ -28,7 +27,7 @@ sw.onerror = (evt) => {
 
 sw.onconnect = (evt) => {
     eventLogger.ports = evt.ports;
-    portNumber++;
+    portAmount++;
 
     evt.ports.forEach(port => {
         port.onmessage = (ev) => {
@@ -39,8 +38,8 @@ sw.onconnect = (evt) => {
                     _disconnect_successful: 0
                 })
                 ev.currentTarget?.close();
-                portNumber--;
-                if (portNumber == 0) {
+                portAmount--;
+                if (portNumber === 0) {
                     sw.close();
                 }
             };
