@@ -20,9 +20,7 @@ let eventLogger = console = new EventLogger(console);
 let portAmount = 0;
 
 sw.onerror = (evt) => {
-    eventLogger.ports.forEach(port => {
-        console.error("Error: " + evt);
-    })
+    console.error("Error: " + evt);
 }
 
 sw.onconnect = (evt) => {
