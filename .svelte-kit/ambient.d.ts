@@ -106,6 +106,7 @@ declare module '$env/static/private' {
 	export const IRBRC: string;
 	export const npm_package_dependencies_xss: string;
 	export const npm_package_devDependencies__typescript_eslint_eslint_plugin: string;
+	export const npm_package_devDependencies__types_uuid: string;
 	export const npm_config_registry: string;
 	export const TERM: string;
 	export const DOTNET_ROOT: string;
@@ -143,6 +144,7 @@ declare module '$env/static/private' {
 	export const npm_package_version: string;
 	export const rvm_prefix: string;
 	export const npm_config_argv: string;
+	export const npm_package_dependencies_uuid: string;
 	export const npm_package_devDependencies_tslib: string;
 	export const npm_package_devDependencies_svelte: string;
 	export const npm_package_scripts_build: string;
@@ -293,6 +295,7 @@ declare module '$env/dynamic/private' {
 		IRBRC: string;
 		npm_package_dependencies_xss: string;
 		npm_package_devDependencies__typescript_eslint_eslint_plugin: string;
+		npm_package_devDependencies__types_uuid: string;
 		npm_config_registry: string;
 		TERM: string;
 		DOTNET_ROOT: string;
@@ -330,6 +333,7 @@ declare module '$env/dynamic/private' {
 		npm_package_version: string;
 		rvm_prefix: string;
 		npm_config_argv: string;
+		npm_package_dependencies_uuid: string;
 		npm_package_devDependencies_tslib: string;
 		npm_package_devDependencies_svelte: string;
 		npm_package_scripts_build: string;

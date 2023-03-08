@@ -32,9 +32,12 @@ sw.onconnect = (evt) => {
 
     evt.ports.forEach(port => {
         port.onmessage = (ev) => {
-            if (typeof ev.data == 'string' && ev.data === 'disconnect'
-            && ev.currentTarget != null && ev.currentTarget instanceof MessagePort) {
-                ev.currentTarget.postMessage("disconnect")
+            if ('_request_disconnect' in ev.data && ev.currentTarget != null
+                && ev.currentTarget instanceof MessagePort) {
+                ev.currentTarget.postMessage({
+                    _packet_name: "Disconnect Successful Packet",
+                    _disconnect_successful: 0
+                })
                 ev.currentTarget?.close();
                 portNumber--;
                 if (portNumber == 0) {
@@ -42,6 +45,7 @@ sw.onconnect = (evt) => {
                 }
             };
         }
+
         port.onmessageerror = (ev) => {
             oldconsole.error(ev)
             self.close();

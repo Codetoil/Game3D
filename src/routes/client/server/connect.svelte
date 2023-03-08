@@ -3,9 +3,16 @@
 -->
 <script lang="ts">
   import xss from "xss";
+  import type {
+    DisconnectSuccessfulPacket,
+    Packet,
+    RequestDisconnectPacket,
+  } from "../../network/packets";
   import ServerWorker from "./server-worker.js?sharedworker";
 
   export let worker: SharedWorker | null = null;
+
+  export let send: (packet: Packet) => void;
 
   export function connectToLocal() {
     if (!worker) {
@@ -13,8 +20,15 @@
       worker = new ServerWorker();
       worker.onerror = (evt) => console.error(evt.error);
       worker.port.onmessage = (ev: MessageEvent) => {
-        console.debug("Recieved: " + xss("" + ev.data));
-        if (typeof ev.data === "string" && ev.data === "disconnect") {
+        if ('_packet_name' in ev.data)
+        {
+          console.debug("Recieved Packet: " + xss((ev.data as Packet)._packet_name));
+        }
+        else
+        {
+          console.debug("Recieved: " + xss("" + ev.data));
+        }
+        if ("_disconnect_successful" in ev.data) {
           console.info("Disconnecting from server");
           worker?.port.close();
           worker = null;
@@ -24,27 +38,32 @@
         console.error("Failed to send message: " + ev.data);
       };
       worker.port.start();
+      send = (packet: Packet) => {
+        worker?.port.postMessage(packet);
+      };
+      connect();
     }
   }
 
   export function connectToLAN() {
-    if (!worker) {
-      console.info("Connecting to server over LAN");
-      // TODO Not implemented yet
-    }
+    console.info("Connecting to server over LAN");
+    // TODO Not implemented yet
   }
 
   export function connectToServer() {
-    if (!worker) {
-      console.info("Connecting to server over Network");
-      // TODO Not implemented yet
-    }
+    console.info("Connecting to server over Network");
+    // TODO Not implemented yet
   }
+
+  export function connect() {}
 
   export function disconnect() {
     if (!!worker) {
       console.info("Requesting to disconnect from server");
-      worker.port.postMessage("disconnect");
+      send({
+        _packet_name: "Request Disconnect Packet",
+        _request_disconnect: 0,
+      } as RequestDisconnectPacket);
     }
   }
 
