@@ -93,11 +93,11 @@ export class PlayerInputController implements InputController {
                 gamepadSource.getInput(1) === 1;
         }
         if (
-            this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualShock)
+            this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualSense)
         ) {
             let gamepadSource = this.deviceSourceManager.getDeviceSource(
-                BABYLON.DeviceType.DualShock
-            ) as BABYLON.DeviceSource<BABYLON.DeviceType.DualShock>;
+                BABYLON.DeviceType.DualSense
+            ) as BABYLON.DeviceSource<BABYLON.DeviceType.DualSense>;
             this.sprintHeld =
                 this.sprintHeld ||
                 gamepadSource.getInput(3) === 1 ||
