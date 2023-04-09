@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "importsNotUsedAsValues": "preserve",
+    "verbatimModuleSyntax": true,
     "lib": ["ES2020", "DOM", "WebWorker"],
     "moduleResolution": "node",
     "module": "ES2020",

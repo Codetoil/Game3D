@@ -3,12 +3,12 @@
 -->
 <script lang="ts">
   import xss from "xss";
-  import type {
-    DisconnectSuccessfulPacket,
-    Packet,
-    RequestDisconnectPacket,
+  import {
+    DisconnectStartPacket,
+    DisconnectSuccessPacket,
+    type Packet,
   } from "../../network/packets";
-  import ServerWorker from "./server-worker.js?sharedworker";
+  import ServerWorkerURL from "./server-worker.js?url";
 
   export let worker: SharedWorker | null = null;
 
@@ -17,18 +17,21 @@
   export function connectToLocal() {
     if (!worker) {
       console.info("Connecting to local server");
-      worker = new ServerWorker();
+      worker = new SharedWorker(ServerWorkerURL);
       worker.onerror = (evt) => console.error(evt.error);
       worker.port.onmessage = (ev: MessageEvent) => {
-        if ('_packet_name' in ev.data)
-        {
-          console.debug("Recieved Packet: " + xss((ev.data as Packet)._packet_name));
-        }
-        else
-        {
+        if (
+          "packet_name" in ev.data &&
+          "packet_id" in ev.data &&
+          "packet_state" in ev.data
+        ) {
+          console.debug(
+            "Recieved Packet: " + xss((ev.data as Packet).packet_name)
+          );
+        } else {
           console.debug("Recieved: " + xss("" + ev.data));
         }
-        if ("_disconnect_successful" in ev.data) {
+        if (ev.data instanceof DisconnectSuccessPacket) {
           console.info("Disconnecting from server");
           worker?.port.close();
           worker = null;
@@ -60,10 +63,7 @@
   export function disconnect() {
     if (!!worker) {
       console.info("Requesting to disconnect from server");
-      send({
-        _packet_name: "Request Disconnect Packet",
-        _request_disconnect: 0,
-      } as RequestDisconnectPacket);
+      send(new DisconnectStartPacket());
     }
   }
 

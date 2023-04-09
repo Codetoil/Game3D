@@ -68,6 +68,7 @@ declare module '$env/static/private' {
 	export const DYNAMIC_INSTALL_ROOT_DIR: string;
 	export const NVM_SYMLINK_CURRENT: string;
 	export const npm_config_init_license: string;
+	export const NODE_OPTIONS: string;
 	export const GRADLE_HOME: string;
 	export const ORYX_DIR: string;
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
@@ -167,7 +168,6 @@ declare module '$env/static/private' {
 	export const npm_execpath: string;
 	export const GITHUB_SERVER_URL: string;
 	export const NVM_CD_FLAGS: string;
-	export const VSCDC_FIXED_SECRETS: string;
 	export const npm_package_dependencies_ts_mixer: string;
 	export const npm_package_devDependencies__sveltejs_adapter_auto: string;
 	export const npm_config_save_prefix: string;
@@ -257,6 +257,7 @@ declare module '$env/dynamic/private' {
 		DYNAMIC_INSTALL_ROOT_DIR: string;
 		NVM_SYMLINK_CURRENT: string;
 		npm_config_init_license: string;
+		NODE_OPTIONS: string;
 		GRADLE_HOME: string;
 		ORYX_DIR: string;
 		VSCODE_GIT_ASKPASS_MAIN: string;
@@ -356,7 +357,6 @@ declare module '$env/dynamic/private' {
 		npm_execpath: string;
 		GITHUB_SERVER_URL: string;
 		NVM_CD_FLAGS: string;
-		VSCDC_FIXED_SECRETS: string;
 		npm_package_dependencies_ts_mixer: string;
 		npm_package_devDependencies__sveltejs_adapter_auto: string;
 		npm_config_save_prefix: string;
