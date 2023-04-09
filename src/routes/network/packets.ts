@@ -34,8 +34,7 @@ export class HandshakePacket implements Packet {
     port: number; // 0-65565
     nextState: number;
 
-    constructor(version: number, address: string, port: number, nextState: number)
-    {
+    constructor(version: number, address: string, port: number, nextState: number) {
         this.version = version;
         this.address = address;
         this.port = port;
@@ -50,8 +49,7 @@ export class LoginStartPacket implements Packet {
     name: string;
     playerUUID?: string;
 
-    constructor(name: string, playerUUID?: string)
-    {
+    constructor(name: string, playerUUID?: string) {
         this.name = name;
         this.playerUUID = playerUUID;
     }
@@ -72,8 +70,7 @@ export class LoginSuccessPacket implements Packet {
     username: string;
     properties: Array<Property>;
 
-    constructor(uuid: string, username: string, properties: Array<Property>)
-    {
+    constructor(uuid: string, username: string, properties: Array<Property>) {
         this.uuid = uuid;
         this.username = username;
         this.properties = properties;

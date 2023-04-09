@@ -24,8 +24,7 @@ sw.onerror = (evt) => {
     console.error("Error: " + evt);
 }
 
-function disconnectPort(port)
-{
+function disconnectPort(port) {
     port.postMessage(new DisconnectSuccessPacket());
     port.close();
     portAmount--;
