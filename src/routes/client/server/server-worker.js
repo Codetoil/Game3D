@@ -28,7 +28,7 @@ function disconnectPort(port) {
     port.postMessage(new DisconnectSuccessPacket());
     port.close();
     portAmount--;
-    if (portAmount === 0) {
+    if (portAmount < 1) {
         sw.close();
     }
 }
