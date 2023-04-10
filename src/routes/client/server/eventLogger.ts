@@ -9,18 +9,18 @@ interface FormatSpecifierSearcher {
 }
 
 export class EventLogger implements Console {
-    private oldConsole: Console;
     public ports!: readonly MessagePort[];
-
-    public get Console(): console.ConsoleConstructor {
-        throw new Error("Do not use, use `new EventLogger()`, instead");
-    }
+    private oldConsole: Console;
 
     constructor(oldConsole: Console) {
         this.oldConsole = oldConsole;
     }
 
-    private hasFormatSpecifiers(formatString: string): boolean {
+    public get Console(): console.ConsoleConstructor {
+        throw new Error("Do not use, use `new EventLogger()`, instead");
+    }
+
+    private formatImpl(formatString: string): FormatSpecifierSearcher {
         return Object.values(formatString).reduce(
             (previousValue: FormatSpecifierSearcher, currentCharacter: string) => {
                 return {
@@ -42,7 +42,11 @@ export class EventLogger implements Console {
                 hasFormatSpecifiers: false,
                 specifierEnd: 0,
             }
-        ).hasFormatSpecifiers;
+        );
+    }
+
+    private hasFormatSpecifiers(formatString: string): boolean {
+        return this.formatImpl(formatString).hasFormatSpecifiers;
     }
 
     private printer(logLevel: string, args: any[]): void {
@@ -63,31 +67,7 @@ export class EventLogger implements Console {
             return i > 1;
         });
 
-        let specifierPos =
-            Object.values(target).reduce(
-                (previousValue: FormatSpecifierSearcher, currentCharacter: string) => {
-                    return {
-                        foundSymbol: currentCharacter === "%",
-                        hasFormatSpecifiers:
-                            previousValue.hasFormatSpecifiers ||
-                            (previousValue.foundSymbol &&
-                                (currentCharacter === "s" ||
-                                    currentCharacter === "d" ||
-                                    currentCharacter === "i" ||
-                                    currentCharacter === "f" ||
-                                    currentCharacter === "o" ||
-                                    currentCharacter === "0")),
-                        specifierEnd:
-                            previousValue.specifierEnd +
-                            (previousValue.hasFormatSpecifiers ? 0 : 1),
-                    };
-                },
-                {
-                    foundSymbol: false,
-                    hasFormatSpecifiers: false,
-                    specifierEnd: 0,
-                }
-            ).specifierEnd - 2;
+        let specifierPos = this.formatImpl(target).specifierEnd - 2;
         let specifier = Object.values(target)
             .splice(specifierPos, 2)
             .reduce((previousValue, currentCharacter) => {

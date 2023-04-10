@@ -7,7 +7,7 @@ import { GameServer } from "./server";
 
 export const load = (async ({ params }) => {
     let gameServer = new GameServer();
-    let ready = new Promise<GameServer>((resolve, reject) => gameServer.init);
+    const ready = new Promise<GameServer>((resolve, reject) => gameServer.init);
     ready.then((value) => {
         value.engine.runRenderLoop(() => {
             if (

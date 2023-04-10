@@ -10,23 +10,23 @@ import { PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 
 export class PlayerInputController implements InputController {
-    private deviceSourceManager!: BABYLON.DeviceSourceManager;
     public joystick: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public sprintHeld: boolean = false;
     public jumpPressed: boolean = false;
+    private deviceSourceManager!: BABYLON.DeviceSourceManager;
 
-    public setEngine(engine: BABYLON.Engine) {
+    public setEngine(engine: BABYLON.Engine): void {
         this.deviceSourceManager = new BABYLON.DeviceSourceManager(engine);
     }
 
-    private setJoystickIfBigger(x: number, z: number) {
+    private setJoystickIfBigger(x: number, z: number): void {
         if (x ** 2 + z ** 2 > this.joystick.lengthSquared()) {
             this.joystick.x = x;
             this.joystick.z = z;
         }
     }
 
-    public tick(entity: EntityServer, world: WorldServer) {
+    public tick(entity: EntityServer, world: WorldServer): void {
         if (!(entity instanceof PlayerClient)) {
             throw new Error("Entity is not a client player.");
         }

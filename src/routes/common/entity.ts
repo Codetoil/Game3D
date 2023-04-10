@@ -47,9 +47,9 @@ export abstract class Entity {
 
 export abstract class Player extends Entity {
     public maxHSpeed: number = -1.0;
-    public canWallJump = true;
+    public canWallJump: boolean = true;
     public lastWallWallJumpedFrom: BABYLON.Nullable<Wall> = null;
-    public jumpState = false;
+    public jumpState: boolean = false;
 
     public get gravity(): number {
         if (this.onWall) return -1.667;
