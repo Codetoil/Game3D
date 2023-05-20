@@ -26,30 +26,34 @@ export class NewConsole implements Console {
     this.countMap = new Map<string, number>();
   }
 
-  private hasFormatSpecifiers(formatString: string): boolean {
-    return Object.values(formatString).reduce(
-      (previousValue: FormatSpecifierSearcher, currentCharacter: string) => {
-        return {
-          foundSymbol: currentCharacter === "%",
-          hasFormatSpecifiers:
-            previousValue.hasFormatSpecifiers ||
-            (previousValue.foundSymbol &&
-              (currentCharacter === "s" ||
-                currentCharacter === "d" ||
-                currentCharacter === "i" ||
-                currentCharacter === "f" ||
-                currentCharacter === "o" ||
-                currentCharacter === "0")),
-          specifierEnd: 0,
-        };
-      },
-      {
-        foundSymbol: false,
-        hasFormatSpecifiers: false,
-        specifierEnd: 0,
-      }
-    ).hasFormatSpecifiers;
-  }
+  private formatImpl(formatString: string): FormatSpecifierSearcher {
+        return Object.values(formatString).reduce(
+            (previousValue: FormatSpecifierSearcher, currentCharacter: string) => {
+                return {
+                    foundSymbol: currentCharacter === "%",
+                    hasFormatSpecifiers:
+                        previousValue.hasFormatSpecifiers ||
+                        (previousValue.foundSymbol &&
+                            (currentCharacter === "s" ||
+                                currentCharacter === "d" ||
+                                currentCharacter === "i" ||
+                                currentCharacter === "f" ||
+                                currentCharacter === "o" ||
+                                currentCharacter === "0")),
+                    specifierEnd: 0,
+                };
+            },
+            {
+                foundSymbol: false,
+                hasFormatSpecifiers: false,
+                specifierEnd: 0,
+            }
+        );
+    }
+
+    private hasFormatSpecifiers(formatString: string): boolean {
+        return this.formatImpl(formatString).hasFormatSpecifiers;
+    }
 
   private printer(logLevel: string, args: any[]): void {
     let argsStr = Object.values(args).reduce(
@@ -70,30 +74,7 @@ export class NewConsole implements Console {
     });
 
     let specifierPos =
-      Object.values(target).reduce(
-        (previousValue: FormatSpecifierSearcher, currentCharacter: string) => {
-          return {
-            foundSymbol: currentCharacter === "%",
-            hasFormatSpecifiers:
-              previousValue.hasFormatSpecifiers ||
-              (previousValue.foundSymbol &&
-                (currentCharacter === "s" ||
-                  currentCharacter === "d" ||
-                  currentCharacter === "i" ||
-                  currentCharacter === "f" ||
-                  currentCharacter === "o" ||
-                  currentCharacter === "0")),
-            specifierEnd:
-              previousValue.specifierEnd +
-              (previousValue.hasFormatSpecifiers ? 0 : 1),
-          };
-        },
-        {
-          foundSymbol: false,
-          hasFormatSpecifiers: false,
-          specifierEnd: 0,
-        }
-      ).specifierEnd - 2;
+      this.formatImpl(target).specifierEnd - 2;
     let specifier = Object.values(target)
       .splice(specifierPos, 2)
       .reduce((previousValue, currentCharacter) => {

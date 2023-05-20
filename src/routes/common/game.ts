@@ -19,15 +19,15 @@ export abstract class Game {
             .then((engine) => {
                 if (!engine) reject(new Error("engine should not be null."));
                 this.createScene()
-                .then((scene) => {
-                    if (!scene) reject(new Error("scene should not be null."));
-                    resolve(this);
-                })
-                .catch(function (e) {
-                    console.error("The available createScene function failed.");
-                    console.error(e);
-                    reject(e);
-                });
+                    .then((scene) => {
+                        if (!scene) reject(new Error("scene should not be null."));
+                        resolve(this);
+                    })
+                    .catch(function (e) {
+                        console.error("The available createScene function failed.");
+                        console.error(e);
+                        reject(e);
+                    });
             })
             .catch((e) => {
                 console.error("The available createEngine function failed.");

@@ -8,6 +8,7 @@ export const options = {
 	app_template_contains_nonce: false,
 	csp: {"mode":"auto","directives":{"upgrade-insecure-requests":false,"block-all-mixed-content":false},"reportOnly":{"upgrade-insecure-requests":false,"block-all-mixed-content":false}},
 	csrf_check_origin: true,
+	track_server_fetches: false,
 	embedded: false,
 	env_public_prefix: 'PUBLIC_',
 	hooks: null, // added lazily, via `get_hooks`

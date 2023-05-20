@@ -26,11 +26,11 @@ export class WorldClient extends World {
                 BABYLON.MeshBuilder.CreateCapsule(
                     "player",
                     {
-                        radius: 0.75,
+                        capSubdivisions: 10,
                         height: 3,
+                        radius: 0.75,
                         subdivisions: 10,
                         tessellation: 10,
-                        capSubdivisions: 10,
                     },
                     this.scene
                 )

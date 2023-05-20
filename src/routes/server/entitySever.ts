@@ -28,7 +28,7 @@ export abstract class EntityServer extends Entity {
         return this;
     }
 
-    protected checkCollisions() {
+    protected checkCollisions(): void {
         this.onGround = this.world.grounds
             .map((ground: Ground) =>
                 this.mesh.intersectsMesh(ground.mesh, false)
@@ -47,7 +47,7 @@ export abstract class EntityServer extends Entity {
 }
 
 export abstract class PlayerServer extends Mixin(EntityServer, Player) {
-    public accelerateAndRotateH(x: number, z: number) {
+    public accelerateAndRotateH(x: number, z: number): void {
         let r = Math.sqrt(x ** 2 + z ** 2);
 
         // Deadzone
@@ -78,11 +78,11 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         }
     }
 
-    public jump() {
+    public jump(): void {
         this.vely = 28.0;
     }
 
-    public wallJump() {
+    public wallJump(): void {
         if (!this.facingDirection) return;
         let ray: BABYLON.Ray = new BABYLON.Ray(this.pos, this.facingDirection, 1);
         let rayHelper: BABYLON.RayHelper = new BABYLON.RayHelper(ray);
@@ -124,7 +124,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         }
     }
 
-    private executeJumpRoutine() {
+    private executeJumpRoutine(): void {
         if (!this.inputController.jumpPressed) {
             this.jumpState = false;
             this.canWallJump = true;
@@ -147,7 +147,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         }
     }
 
-    private applyHMovementInfluences() {
+    private applyHMovementInfluences(): void {
         if (this.inputController.sprintHeld && this.onGround) {
             this.maxHSpeed *= 1.3;
         } else if (this.inputController.sprintHeld && !this.onGround) {
@@ -158,7 +158,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         }
     }
 
-    private applyGravity() {
+    private applyGravity(): void {
         if (!this.onGround) {
             this.vely += this.gravity;
         }
@@ -167,7 +167,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         }
     }
 
-    private moveMesh() {
+    private moveMesh(): void {
         this.maxHSpeed = 2.5 + 10.0 * this.inputController.joystick.length();
 
         if (this.inputController.joystick != null) {
@@ -195,7 +195,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         this.rot = this.mesh.rotationQuaternion as BABYLON.Quaternion;
     }
 
-    public tick(cameraAngle: BABYLON.Quaternion) {
+    public tick(cameraAngle: BABYLON.Quaternion): void {
         console.assert(!!cameraAngle, "Camera angle cannot be undefined");
 
         this.checkCollisions();
