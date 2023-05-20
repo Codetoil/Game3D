@@ -12,7 +12,7 @@
     LoginStartPacket,
     DisconnectPacket,
   } from "../common/network/packets";
-  import ServerWorkerURL from "./server/server-worker.js?url";
+  import ServerWorker from "./server/server-worker.js?sharedworker";
   import { PROTOCOL } from "../common/version";
 
   export let worker: SharedWorker | null = null;
@@ -21,10 +21,10 @@
 
   export let send: (packet: Packet) => void;
 
-  export function connectToLocal(name: string, playerUUID?: string) {
+  export function connectToLocal(event: MouseEvent, name: string, playerUUID?: string) {
     if (!worker) {
       console.info("Connecting to local server");
-      worker = new SharedWorker(ServerWorkerURL);
+      worker = new ServerWorker();
       worker.onerror = (evt) => console.error(evt.error);
       worker.port.onmessage = (ev: MessageEvent) => {
         if (

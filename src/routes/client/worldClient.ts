@@ -45,7 +45,7 @@ export class WorldClient extends World {
         );
 
         this.player.texture = new BABYLON.Texture(
-            "%sveltekit.assets%/temp_player.png",
+            "temp_player.png",
             this.scene
         );
         (this.player.mesh.material as BABYLON.StandardMaterial).diffuseTexture =
