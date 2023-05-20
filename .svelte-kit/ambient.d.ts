@@ -36,6 +36,8 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const COREPACK_ROOT: string;
 	export const DriverData: string;
+	export const FPS_BROWSER_APP_PROFILE_STRING: string;
+	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const GRADLE_USER_HOME: string;
 	export const HOMEDRIVE: string;
@@ -179,6 +181,8 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		COREPACK_ROOT: string;
 		DriverData: string;
+		FPS_BROWSER_APP_PROFILE_STRING: string;
+		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		GRADLE_USER_HOME: string;
 		HOMEDRIVE: string;

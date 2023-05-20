@@ -9,18 +9,23 @@ export abstract class Game {
     public abstract name: string;
     public world!: World;
     public engine!: BABYLON.Engine;
+    public scene!: BABYLON.Scene;
+    public camera!: BABYLON.Camera;
     public started: boolean = false;
     public stopped: boolean = false;
-    public abstract createEngine(): Promise<BABYLON.Engine>;
-    public abstract createScene(): Promise<BABYLON.Scene>;
+    public abstract async createEngine(): Promise<BABYLON.Engine>;
+    public abstract async createScene(): Promise<BABYLON.Scene>;
+    public abstract async setMenuCamera(): void;
 
     public init(resolve: (value: Game | PromiseLike<Game>) => void, reject: (reason?: any) => void) {
         this.createEngine()
             .then((engine) => {
                 if (!engine) reject(new Error("engine should not be null."));
+                this.engine = engine;
                 this.createScene()
                     .then((scene) => {
                         if (!scene) reject(new Error("scene should not be null."));
+                        this.scene = scene;
                         resolve(this);
                     })
                     .catch(function (e) {
@@ -36,14 +41,13 @@ export abstract class Game {
             }).then(
                 () => {
                     this.started = true
-                    console.info("Starting " + this.name + "...");
-                    this.world.load(this.engine)
+                    console.info("Started " + this.name);
                 }
             );
     }
 
-    public tick() {
-        if (!this.started || this.stopped) return;
+    public tick(): void {
+        if (!this.started || this.stopped || !(this.world !== null)) return;
         this.world.tick();
     }
 }

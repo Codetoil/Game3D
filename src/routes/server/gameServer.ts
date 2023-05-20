@@ -3,7 +3,7 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
-import { Game } from "../../common/game";
+import { Game } from "../common/game";
 
 export class GameServer extends Game {
     public name: string = "Server";
@@ -32,7 +32,7 @@ export class GameServer extends Game {
     }
     public createScene(): Promise<BABYLON.Scene> {
         this.world.scene.onBeforeRenderObservable.add(
-            this.tick
+            this.tick.bind(this)
         );
         this.engine.runRenderLoop(() => {
             if (

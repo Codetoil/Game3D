@@ -17,8 +17,6 @@ import { EventLogger } from "./eventLogger"
 // @ts-ignore
 let sw = self;
 
-console.debug("TEST!")
-
 let oldconsole = console;
 let eventLogger = console = new EventLogger(console);
 let portAmount = 0;
@@ -37,8 +35,8 @@ function disconnectPort(port) {
     }
 }
 
-function letDisconnectPort(port, reason) {
-    port.postMessage(new DisconnectSuccessPacket(reason));
+function closeConnectionPort(port) {
+    port.postMessage(new DisconnectSuccessPacket());
     disconnectPort(port)
 }
 
@@ -68,6 +66,7 @@ sw.onconnect = (evt) => {
                 console.debug(
                     "[Server] Recieved Packet: " + ev.data.packet_name
                 )
+                // Handshake Packet
                 if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.HANDSHAKING)
                 {
                     if (ev.data.protocol < PROTOCOL) {
@@ -95,15 +94,20 @@ sw.onconnect = (evt) => {
                         }
                     }
                 }
+                // Login Start Packet
                 if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.LOGIN) {
-                    // Do something with the game server
-                    let playerUUID = ev.data.playerUUID !== null ? ev.data.playerUUID : "temp";
+                    let playerUUID = !!ev.data.playerUUID ? ev.data.playerUUID : "temp";
                     let playerName = ev.data.playerName;
                     port.postMessage(new LoginSuccessPacket(playerUUID, playerName))
                     console.debug("Switching state for port " + port + " to PLAY");
                     portStates.set(port, State.PLAY);
+                    // Do something with the game server
                 }
-
+                // Disconnect Start Packet
+                if (ev.data.packet_id === 0x70 && ev.data.packet_state === State.PLAY) {
+                    console.info("User at port " + port + " requesting disconnect, closing connection.");
+                    closeConnectionPort(port);
+                }
             } else {
                 console.debug("Recieved: " + ev.data);
             }

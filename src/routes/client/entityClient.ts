@@ -7,14 +7,10 @@ import { Mixin } from "ts-mixer";
 import { PlayerInputController } from "./clientInputController";
 import { WorldClient } from "./worldClient";
 import { Entity, Player } from "../common/entity";
+import type { World } from "../common/world";
 
 export abstract class EntityClient extends Entity {
     public texture?: BABYLON.Texture;
-
-    public setWorld(world: WorldClient): EntityClient {
-        super.setWorld(world);
-        return this;
-    }
 }
 
 export class PlayerClient extends Mixin(EntityClient, Player) {
@@ -25,9 +21,9 @@ export class PlayerClient extends Mixin(EntityClient, Player) {
         this.inputController = new PlayerInputController();
     }
 
-    public setWorld(world: WorldClient): PlayerClient {
+    public setWorld(world: World): Player {
         super.setWorld(world);
-        this.inputController.setEngine(this.world.scene.getEngine());
+        this.inputController.setEngine(this.world.game.engine);
         return this;
     }
 

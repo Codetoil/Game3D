@@ -94,4 +94,9 @@ export class KickPacket implements Packet {
     packet_name: string = "Kick";
     packet_id: number = 0x72;
     packet_state: State = State.PLAY;
+    reason: string;
+
+    constructor(reason: string) {
+        this.reason = reason;
+    }
 }

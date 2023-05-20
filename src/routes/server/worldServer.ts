@@ -6,13 +6,12 @@ import * as BABYLON from "@babylonjs/core";
 import { Wall, Ground, World } from "../common/world";
 
 export class WorldServer extends World {
-    public load(engine: BABYLON.Engine) {
-        this.read(engine);
+    public load() {
+        this.read();
         this.send();
     }
 
-    public read(engine: BABYLON.Engine) {
-        this.scene = new BABYLON.Scene(engine);
+    public read() {
         this.grounds = [];
         this.walls = [];
 
@@ -20,7 +19,7 @@ export class WorldServer extends World {
         var ground: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
             "ground",
             { width: 20.0, depth: 20.0, height: 0.5 },
-            this.scene
+            this.game.scene
         );
         ground.material = new BABYLON.StandardMaterial("groundMat", this.scene);
         (ground.material as BABYLON.StandardMaterial).diffuseColor =
@@ -33,7 +32,7 @@ export class WorldServer extends World {
         var wall: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
             "wall",
             { width: 15, height: 15, depth: 0.75 },
-            this.scene
+            this.game.scene
         );
         wall.material = new BABYLON.StandardMaterial("wallMat", this.scene);
         (wall.material as BABYLON.StandardMaterial).diffuseColor =
@@ -46,7 +45,7 @@ export class WorldServer extends World {
         var wall2: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox(
             "wall2",
             { width: 15, height: 15, depth: 0.75 },
-            this.scene
+            this.game.scene
         );
         wall2.material = wall.material;
         wall2.position = new BABYLON.Vector3(6.8, -2.5, -15);
@@ -56,7 +55,7 @@ export class WorldServer extends World {
         var platform = BABYLON.MeshBuilder.CreateBox(
             "platform1",
             { width: 5.0, depth: 5.0, height: 0.5 },
-            this.scene
+            this.game.scene
         );
         platform.material = wall.material;
         platform.position = new BABYLON.Vector3(17, -10, -10);
@@ -65,7 +64,7 @@ export class WorldServer extends World {
         var dbox = BABYLON.MeshBuilder.CreateBox(
             "dbox",
             { width: 1, height: 2, depth: 1 },
-            this.scene
+            this.game.scene
         );
         dbox.position = wall.position;
         dbox.material = new BABYLON.StandardMaterial("dboxMat", this.scene);

@@ -5,19 +5,23 @@
 import * as BABYLON from "@babylonjs/core";
 import { PlayerClient } from "./entityClient";
 import { World } from "../common/world";
+import type { Game } from "../common/game";
 
 export class WorldClient extends World {
-    public camera!: BABYLON.ArcFollowCamera;
     public player!: PlayerClient;
 
-    public load(engine: BABYLON.Engine): void {
-        this.scene = new BABYLON.Scene(engine);
+    constructor(game: Game)
+    {
+        super(game);
+    }
+
+    public load(): void {
 
         // Lights
         var _lightHemi: BABYLON.Light = new BABYLON.HemisphericLight(
             "hemi",
             new BABYLON.Vector3(0, 1, 0),
-            this.scene
+            this.game.scene
         );
         // Create the player entity
         this.player = new PlayerClient()
@@ -32,7 +36,7 @@ export class WorldClient extends World {
                         subdivisions: 10,
                         tessellation: 10,
                     },
-                    this.scene
+                    this.game.scene
                 )
             )
             .setPositionAndRotation(
@@ -41,39 +45,39 @@ export class WorldClient extends World {
             ) as PlayerClient;
         this.player.mesh.material = new BABYLON.StandardMaterial(
             "playerMat",
-            this.scene
+            this.game.scene
         );
 
         this.player.texture = new BABYLON.Texture(
             "temp_player.png",
-            this.scene
+            this.game.scene
         );
         (this.player.mesh.material as BABYLON.StandardMaterial).diffuseTexture =
             this.player.texture;
         this.player.texture.hasAlpha = true;
         this.player.onGround = true;
 
-        this.camera = new BABYLON.ArcFollowCamera(
+        this.game.camera = new BABYLON.ArcFollowCamera(
             "camera",
             Math.PI / 2,
             0.5,
             10,
             this.player.mesh,
-            this.scene
+            this.game.scene
         );
-        this.camera.orthoBottom = -10;
-        this.camera.orthoLeft = -10;
-        this.camera.orthoRight = 10;
-        this.camera.orthoTop = 10;
-        // this.camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-        if (this.camera.mode === BABYLON.Camera.ORTHOGRAPHIC_CAMERA) {
-            this.camera.rotationQuaternion = new BABYLON.Vector3(
+        (this.game.camera as BABYLON.ArcFollowCamera).orthoBottom = -10;
+        (this.game.camera as BABYLON.ArcFollowCamera).orthoLeft = -10;
+        (this.game.camera as BABYLON.ArcFollowCamera).orthoRight = 10;
+        (this.game.camera as BABYLON.ArcFollowCamera).orthoTop = 10;
+        // this.game.camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+        if (this.game.camera.mode === BABYLON.Camera.ORTHOGRAPHIC_CAMERA) {
+            (this.game.camera as BABYLON.ArcFollowCamera).rotationQuaternion = new BABYLON.Vector3(
                 Math.PI / 2,
                 0.0,
                 0.0
             ).toQuaternion();
         } else {
-            this.camera.rotationQuaternion = new BABYLON.Vector3(
+            (this.game.camera as BABYLON.ArcFollowCamera).rotationQuaternion = new BABYLON.Vector3(
                 Math.PI / 2,
                 0,
                 0.25

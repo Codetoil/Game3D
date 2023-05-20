@@ -7,36 +7,25 @@
   import { onMount } from "svelte";
   import { Game } from "../common/game";
   import { WorldClient } from "./worldClient";
+  import { setGame } from "./connectClient";
 
   export class GameClient extends Game {
     public name: string = "Game";
-    public ready: Promise<GameClient> = new Promise((resolve, reject) => {
+    public ready: Promise<Game> = new Promise((resolve, reject) => {
       onMount(() => this.init(resolve, reject));
     });
     public canvas!: HTMLCanvasElement;
 
-    public clientWorld!: WorldClient;
+    public world!: WorldClient;
 
     public init(
-      resolve: (value: GameClient | PromiseLike<GameClient>) => void,
+      resolve: (value: Game | PromiseLike<Game>) => void,
       reject: (reason?: any) => void
     ) {
       this.canvas = document.getElementById(
         "renderCanvas"
       ) as HTMLCanvasElement;
-      super.init((oldArgs) => resolve(this.convertFromValue(oldArgs)), reject);
-    }
-
-    private convertFromValue(
-      value: Game | PromiseLike<Game>
-    ): GameClient | PromiseLike<GameClient> {
-      if (value instanceof GameClient) {
-        return value as GameClient;
-      } else if (this.isGameClientPromiseLike(value)) {
-        return value as PromiseLike<GameClient>;
-      } else {
-        throw new Error("Not of the form");
-      }
+      super.init(resolve, reject);
     }
 
     private isGameClientPromiseLike(
@@ -48,7 +37,7 @@
     public async createEngine(): Promise<BABYLON.Engine> {
       const webGPUSupported = await BABYLON.WebGPUEngine.IsSupportedAsync;
       console.log("Using WebGPU: " + webGPUSupported);
-      if (webGPUSupported) {
+      if (webGPUSupported && false) { // Don't have neccesary packages for WebGPU
         this.engine = new BABYLON.WebGPUEngine(this.canvas, {
           antialias: true,
           stencil: true,
@@ -65,19 +54,23 @@
     }
 
     public async createScene(): Promise<BABYLON.Scene> {
-      this.clientWorld = new WorldClient();
-      this.clientWorld.load(this.engine);
+      this.scene = new BABYLON.Scene(this.engine);
+      this.setMenuCamera();
 
-      this.clientWorld.scene.onBeforeRenderObservable.add(
-        this.beforeRender.bind(null, this)
+      this.scene.onBeforeRenderObservable.add(
+        this.beforeRender.bind(this)
       );
 
-      return this.clientWorld.scene;
+      return this.scene;
     }
 
-    private beforeRender(gameClient: GameClient) {
-      if (!gameClient.started || gameClient.stopped) return;
-      gameClient.clientWorld.tick();
+    public async setMenuCamera(): void {
+      this.camera = new BABYLON.UniversalCamera("default", new BABYLON.Vector3(0, 0, 0), this.scene)
+    }
+
+    private beforeRender(): void {
+      if (!this.started || this.stopped || !this.world) return;
+      this.world.tick();
     }
   }
 
@@ -91,23 +84,24 @@
 
   gameClient.ready.then((value) => {
     window.addEventListener("resize", EventHandler.onResize.bind(null, value));
+    setGame(value);
 
     value.engine.runRenderLoop(() => {
       if (
         value.started &&
         !value.stopped &&
-        value.clientWorld.scene &&
-        value.clientWorld.scene.activeCamera
+        value.scene &&
+        value.scene.activeCamera
       ) {
         try {
-          value.clientWorld.scene.render();
+          value.scene.render();
         } catch (e: any) {
           console.error(e);
           value.stopped = true;
         }
       } else if (value.stopped && value.engine) {
         value.engine.stopRenderLoop();
-        console.error("Stopping game...");
+        console.error("Stopped game.");
       }
     });
   });

@@ -2,7 +2,7 @@
 	"/": [
 		"src/routes/+page.ts"
 	],
-	"/server/dedicated": [
-		"src/routes/server/dedicated/+page.server.ts"
+	"/server": [
+		"src/routes/server/+page.server.ts"
 	]
 }

@@ -3,6 +3,7 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
+import type { Game } from "./game";
 
 export class Ground {
     public mesh!: BABYLON.AbstractMesh;
@@ -23,10 +24,15 @@ export class Wall {
 }
 
 export abstract class World {
-    public scene!: BABYLON.Scene;
+    public game: Game;
     public grounds!: Ground[];
     public walls!: Wall[];
 
-    public abstract load(engine: BABYLON.Engine): void;
+    constructor(game: Game)
+    {
+        this.game = game;
+    }
+
+    public abstract load(): void;
     public abstract tick(): void;
 }
