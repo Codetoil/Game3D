@@ -10,8 +10,7 @@ import type { Game } from "../common/game";
 export class WorldClient extends World {
     public player!: PlayerClient;
 
-    constructor(game: Game)
-    {
+    constructor(game: Game) {
         super(game);
     }
 

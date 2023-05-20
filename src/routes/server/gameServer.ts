@@ -7,7 +7,7 @@ import { Game } from "../common/game";
 
 export class GameServer extends Game {
     public name: string = "Server";
-    
+
     private convertFromValue(
         value: Game | PromiseLike<Game>
     ): GameServer | PromiseLike<GameServer> {

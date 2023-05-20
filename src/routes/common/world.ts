@@ -28,8 +28,7 @@ export abstract class World {
     public grounds!: Ground[];
     public walls!: Wall[];
 
-    constructor(game: Game)
-    {
+    constructor(game: Game) {
         this.game = game;
     }
 

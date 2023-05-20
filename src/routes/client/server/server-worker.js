@@ -67,29 +67,24 @@ sw.onconnect = (evt) => {
                     "[Server] Recieved Packet: " + ev.data.packet_name
                 )
                 // Handshake Packet
-                if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.HANDSHAKING)
-                {
+                if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.HANDSHAKING) {
                     if (ev.data.protocol < PROTOCOL) {
                         loginRefusePort(port, "Newer server protocol! " + PROTOCOL + " vs " + ev.data.version);
                     }
                     else if (ev.data.protocol > PROTOCOL) {
                         loginRefusePort(port, "Outdated server protocol! " + PROTOCOL + " vs " + ev.data.version);
                     }
-                    else
-                    {
-                        if (ev.data.nextState === State.STATUS)
-                        {
+                    else {
+                        if (ev.data.nextState === State.STATUS) {
                             // ignore for now
                             console.debug("Switching state for port " + port + " to STATUS");
                             portStates.set(port, State.STATUS);
                         }
-                        else if (ev.data.nextState === State.LOGIN)
-                        {
+                        else if (ev.data.nextState === State.LOGIN) {
                             console.debug("Switching state for port " + port + " to LOGIN");
                             portStates.set(port, State.LOGIN);
                         }
-                        else
-                        {
+                        else {
                             loginRefusePort(port, "Status not of valid options [Status, Login]: " + ev.data.nextState)
                         }
                     }

@@ -37,7 +37,8 @@
     public async createEngine(): Promise<BABYLON.Engine> {
       const webGPUSupported = await BABYLON.WebGPUEngine.IsSupportedAsync;
       console.log("Using WebGPU: " + webGPUSupported);
-      if (webGPUSupported && false) { // Don't have neccesary packages for WebGPU
+      if (webGPUSupported && false) {
+        // Don't have neccesary packages for WebGPU
         this.engine = new BABYLON.WebGPUEngine(this.canvas, {
           antialias: true,
           stencil: true,
@@ -57,15 +58,17 @@
       this.scene = new BABYLON.Scene(this.engine);
       this.setMenuCamera();
 
-      this.scene.onBeforeRenderObservable.add(
-        this.beforeRender.bind(this)
-      );
+      this.scene.onBeforeRenderObservable.add(this.beforeRender.bind(this));
 
       return this.scene;
     }
 
     public async setMenuCamera(): void {
-      this.camera = new BABYLON.UniversalCamera("default", new BABYLON.Vector3(0, 0, 0), this.scene)
+      this.camera = new BABYLON.UniversalCamera(
+        "default",
+        new BABYLON.Vector3(0, 0, 0),
+        this.scene
+      );
     }
 
     private beforeRender(): void {
