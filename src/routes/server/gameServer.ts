@@ -3,7 +3,7 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
-import { Game } from "../../common/game";
+import { Game } from "../common/game";
 
 export class GameServer extends Game {
     public name: string = "Server";

@@ -30,7 +30,6 @@ declare module '$env/static/private' {
 	export const DOCKER_BUILDKIT: string;
 	export const LESSOPEN: string;
 	export const ENABLE_DYNAMIC_INSTALL: string;
-	export const SDKMAN_VERSION: string;
 	export const GITHUB_CODESPACE_TOKEN: string;
 	export const PYTHONIOENCODING: string;
 	export const npm_package_devDependencies_vitest: string;
@@ -68,7 +67,6 @@ declare module '$env/static/private' {
 	export const DYNAMIC_INSTALL_ROOT_DIR: string;
 	export const NVM_SYMLINK_CURRENT: string;
 	export const npm_config_init_license: string;
-	export const NODE_OPTIONS: string;
 	export const GRADLE_HOME: string;
 	export const ORYX_DIR: string;
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
@@ -219,7 +217,6 @@ declare module '$env/dynamic/private' {
 		DOCKER_BUILDKIT: string;
 		LESSOPEN: string;
 		ENABLE_DYNAMIC_INSTALL: string;
-		SDKMAN_VERSION: string;
 		GITHUB_CODESPACE_TOKEN: string;
 		PYTHONIOENCODING: string;
 		npm_package_devDependencies_vitest: string;
@@ -257,7 +254,6 @@ declare module '$env/dynamic/private' {
 		DYNAMIC_INSTALL_ROOT_DIR: string;
 		NVM_SYMLINK_CURRENT: string;
 		npm_config_init_license: string;
-		NODE_OPTIONS: string;
 		GRADLE_HOME: string;
 		ORYX_DIR: string;
 		VSCODE_GIT_ASKPASS_MAIN: string;

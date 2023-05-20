@@ -3,7 +3,7 @@
  */
 
 import type { PageServerLoad } from './$types';
-import { GameServer } from "./server";
+import { GameServer } from "../gameServer";
 
 export const load = (async ({ params }) => {
     let gameServer = new GameServer();

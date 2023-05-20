@@ -29,15 +29,11 @@ export class HandshakePacket implements Packet {
     packet_name: string = "Handshake";
     packet_id: number = 0x00;
     packet_state: State = State.HANDSHAKING;
-    version: number;
-    address: string;
-    port: number; // 0-65565
-    nextState: number;
+    protocol: number;
+    nextState: State;
 
-    constructor(version: number, address: string, port: number, nextState: number) {
-        this.version = version;
-        this.address = address;
-        this.port = port;
+    constructor(protocol: number, nextState: State) {
+        this.protocol = protocol;
         this.nextState = nextState;
     }
 }
@@ -46,11 +42,11 @@ export class LoginStartPacket implements Packet {
     packet_name: string = "Login Start";
     packet_id: number = 0x00;
     packet_state: State = State.LOGIN;
-    name: string;
+    playerName: string;
     playerUUID?: string;
 
-    constructor(name: string, playerUUID?: string) {
-        this.name = name;
+    constructor(playerName: string, playerUUID?: string) {
+        this.playerName = playerName;
         this.playerUUID = playerUUID;
     }
 }
@@ -77,8 +73,25 @@ export class LoginSuccessPacket implements Packet {
     }
 }
 
+export class DisconnectPacket implements Packet {
+    packet_name: string = "Disconnect (at login)";
+    packet_id: number = 0x00;
+    packet_state: State = State.LOGIN;
+    reason: string;
+
+    constructor(reason: string) {
+        this.reason = reason;
+    }
+}
+
 export class DisconnectSuccessPacket implements Packet {
     packet_name: string = "Disconnect Success";
     packet_id: number = 0x71;
+    packet_state: State = State.PLAY;
+}
+
+export class KickPacket implements Packet {
+    packet_name: string = "Kick";
+    packet_id: number = 0x72;
     packet_state: State = State.PLAY;
 }
