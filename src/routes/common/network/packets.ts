@@ -19,16 +19,16 @@ export enum State {
 }
 
 export interface Packet {
-    packet_name: string;
-    packet_id: number;
-    packet_state: State;
+    packetName: string;
+    packetId: number;
+    packetState: State;
 }
 
 // To Server
-export class HandshakePacket implements Packet {
-    packet_name: string = "Handshake";
-    packet_id: number = 0x00;
-    packet_state: State = State.HANDSHAKING;
+export class ServerboundHandshakePacket implements Packet {
+    packetName: string = "Serverbound Handshake";
+    packetId: number = 0x00;
+    packetState: State = State.HANDSHAKING;
     protocol: number;
     nextState: State;
 
@@ -38,10 +38,10 @@ export class HandshakePacket implements Packet {
     }
 }
 
-export class LoginStartPacket implements Packet {
-    packet_name: string = "Login Start";
-    packet_id: number = 0x00;
-    packet_state: State = State.LOGIN;
+export class ServerboundLoginStartPacket implements Packet {
+    packetName: string = "Serverbound Login Start";
+    packetId: number = 0x00;
+    packetState: State = State.LOGIN;
     playerName: string;
     playerUUID?: string;
 
@@ -51,17 +51,28 @@ export class LoginStartPacket implements Packet {
     }
 }
 
-export class DisconnectStartPacket implements Packet {
-    packet_name: string = "Disconnect Start";
-    packet_id: number = 0x70;
-    packet_state: State = State.PLAY;
+export class ServerboundDisconnectStartPacket implements Packet {
+    packetName: string = "Serverbound Disconnect Start";
+    packetId: number = 0x70;
+    packetState: State = State.PLAY;
+}
+
+export class ServerboundKeepAlivePacket implements Packet {
+    packetName: string = "Serverbound Keep Alive";
+    packetId: number = 0x23;
+    packetState: State = State.PLAY;
+    keepAliveID: number;
+
+    constructor(keepAliveID: number) {
+        this.keepAliveID = keepAliveID;
+    }
 }
 
 // To Client
-export class LoginSuccessPacket implements Packet {
-    packet_name: string = "Login Success";
-    packet_id: number = 0x02;
-    packet_state: State = State.LOGIN;
+export class ClientboundLoginSuccessPacket implements Packet {
+    packetName: string = "Clientbound Login Success";
+    packetId: number = 0x02;
+    packetState: State = State.LOGIN;
     uuid: string;
     username: string;
     properties: Array<Property>;
@@ -73,10 +84,10 @@ export class LoginSuccessPacket implements Packet {
     }
 }
 
-export class DisconnectPacket implements Packet {
-    packet_name: string = "Disconnect (at login)";
-    packet_id: number = 0x00;
-    packet_state: State = State.LOGIN;
+export class ClientboundDisconnectPacket implements Packet {
+    packetName: string = "Clientbound Disconnect at Login";
+    packetId: number = 0x00;
+    packetState: State = State.LOGIN;
     reason: string;
 
     constructor(reason: string) {
@@ -84,19 +95,30 @@ export class DisconnectPacket implements Packet {
     }
 }
 
-export class DisconnectSuccessPacket implements Packet {
-    packet_name: string = "Disconnect Success";
-    packet_id: number = 0x71;
-    packet_state: State = State.PLAY;
+export class ClientboundDisconnectSuccessPacket implements Packet {
+    packetName: string = "Clientbound Disconnect Success";
+    packetId: number = 0x71;
+    packetState: State = State.PLAY;
 }
 
-export class KickPacket implements Packet {
-    packet_name: string = "Kick";
-    packet_id: number = 0x72;
-    packet_state: State = State.PLAY;
+export class ClientboundKickPacket implements Packet {
+    packetName: string = "Clientbound Kick";
+    packetId: number = 0x72;
+    packetState: State = State.PLAY;
     reason: string;
 
     constructor(reason: string) {
         this.reason = reason;
+    }
+}
+
+export class ClientboundKeepAlivePacket implements Packet {
+    packetName: string = "Serverbound Keep Alive";
+    packetId: number = 0x12;
+    packetState: State = State.PLAY;
+    keepAliveID: number;
+
+    constructor(keepAliveID: number) {
+        this.keepAliveID = keepAliveID;
     }
 }

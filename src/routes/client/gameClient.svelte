@@ -7,7 +7,8 @@
   import { onMount } from "svelte";
   import { Game } from "../common/game";
   import { WorldClient } from "./worldClient";
-  import { setGame } from "./connectClient";
+  import { ConnectClient } from "./connectClient";
+  import { ConnectClientLocal } from "./connectClientLocal";
 
   export class GameClient extends Game {
     public name: string = "Game";
@@ -15,8 +16,15 @@
       onMount(() => this.init(resolve, reject));
     });
     public canvas!: HTMLCanvasElement;
-
+    public connectClient: ConnectClient;
     public world!: WorldClient;
+
+    public constructor()
+    {
+      super();
+      this.connectClient = new ConnectClientLocal();
+      this.connectClient.setGame(this);
+    }
 
     public init(
       resolve: (value: Game | PromiseLike<Game>) => void,
@@ -87,7 +95,6 @@
 
   gameClient.ready.then((value) => {
     window.addEventListener("resize", EventHandler.onResize.bind(null, value));
-    setGame(value);
 
     value.engine.runRenderLoop(() => {
       if (
@@ -111,6 +118,9 @@
 </script>
 
 <canvas id="renderCanvas" />
+<button on:click={gameClient.connectClient.connect.bind(gameClient.connectClient, "Codetoil")}>Connect to Server</button>
+<button on:click={gameClient.connectClient.requestDisconnect.bind(gameClient.connectClient)}>Disconnect from Server</button>
+<button on:click={gameClient.connectClient.forceDisconnect.bind(gameClient.connectClient)}>Forcefully Disconnect from Server</button>
 
 <style>
   #renderCanvas {

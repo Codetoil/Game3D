@@ -3,10 +3,8 @@
 -->
 <script lang="ts">
   import GameClient from "./client/gameClient.svelte";
-  import Logger from "../lib/logger.svelte";
-  import ConnectClientGUI from "./client/connectClientGUI.svelte";
+  // import Logger from "../lib/logger.svelte";
 </script>
 
 <GameClient />
-<ConnectClientGUI />
-<Logger />
+<!-- <Logger /> -->

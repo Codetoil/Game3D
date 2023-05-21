@@ -7,9 +7,9 @@
 /// <reference lib="es2020" />
 /// <reference lib="webworker" />
 
-import { LoginSuccessPacket, DisconnectPacket, DisconnectSuccessPacket, KickPacket, State } from "../../common/network/packets";
+import { ClientboundLoginSuccessPacket, ClientboundDisconnectPacket, ClientboundDisconnectSuccessPacket, ClientboundKickPacket, State } from "../../common/network/packets";
 import { PROTOCOL as PROTOCOL } from "../../common/version";
-import { EventLogger } from "./eventLogger"
+// import { EventLogger } from "./eventLogger"
 
 /**
  * @type {SharedWorkerGlobalScope}
@@ -17,10 +17,11 @@ import { EventLogger } from "./eventLogger"
 // @ts-ignore
 let sw = self;
 
-let oldconsole = console;
-let eventLogger = console = new EventLogger(console);
-let portAmount = 0;
+// let oldconsole = console;
+// let eventLogger = console = new EventLogger(console);
+let ports = [];
 let portStates = new Map();
+let portHasGottenPacket = new Map();
 
 sw.onerror = (evt) => {
     console.error("Error: " + evt);
@@ -29,50 +30,51 @@ sw.onerror = (evt) => {
 function disconnectPort(port) {
     port.close();
     portStates.delete(port);
-    portAmount--;
-    if (portAmount < 1) {
+    portHasGottenPacket.delete(port);
+    if (portStates.size < 1) {
+        console.info("All players offline, disconnecting...")
         sw.close();
     }
 }
 
 function closeConnectionPort(port) {
-    port.postMessage(new DisconnectSuccessPacket());
+    port.postMessage(new ClientboundDisconnectSuccessPacket());
     disconnectPort(port)
 }
 
 function kickPlayerPort(port, reason) {
-    port.postMessage(new KickPacket(reason));
+    port.postMessage(new ClientboundKickPacket(reason));
     disconnectPort(port)
 }
 
 function loginRefusePort(port, reason) {
-    port.postMessage(new DisconnectPacket(reason));
+    port.postMessage(new ClientboundDisconnectPacket(reason));
     disconnectPort(port)
 }
 
 sw.onconnect = (evt) => {
-    eventLogger.ports = evt.ports;
-    portAmount++;
+    ports = evt.ports;
+    portStates.set(evt.source, State.HANDSHAKING);
+    portHasGottenPacket.set(evt.source, State.HANDSHAKING);
 
     evt.ports.forEach(port => {
         port.onmessage = (ev) => {
-            if (!portStates.has(port)) portStates.set(port, State.HANDSHAKING);
             if (
-                "packet_name" in ev.data &&
-                "packet_id" in ev.data &&
-                "packet_state" in ev.data &&
-                ev.data.packet_state === portStates.get(port)
+                "packetName" in ev.data &&
+                "packetId" in ev.data &&
+                "packetState" in ev.data &&
+                ev.data.packetState === portStates.get(port)
             ) {
                 console.debug(
-                    "[Server] Recieved Packet: " + ev.data.packet_name
+                    "[Server] Recieved Packet: " + ev.data.packetName
                 )
                 // Handshake Packet
-                if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.HANDSHAKING) {
+                if (ev.data.packetId === 0x00 && ev.data.packetState === State.HANDSHAKING) {
                     if (ev.data.protocol < PROTOCOL) {
-                        loginRefusePort(port, "Newer server protocol! " + PROTOCOL + " vs " + ev.data.version);
+                        loginRefusePort(port, "Newer server protocol! " + PROTOCOL + " vs " + ev.data.protocol);
                     }
                     else if (ev.data.protocol > PROTOCOL) {
-                        loginRefusePort(port, "Outdated server protocol! " + PROTOCOL + " vs " + ev.data.version);
+                        loginRefusePort(port, "Outdated server protocol! " + PROTOCOL + " vs " + ev.data.protocol);
                     }
                     else {
                         if (ev.data.nextState === State.STATUS) {
@@ -90,16 +92,17 @@ sw.onconnect = (evt) => {
                     }
                 }
                 // Login Start Packet
-                if (ev.data.packet_id === 0x00 && ev.data.packet_state === State.LOGIN) {
+                if (ev.data.packetId === 0x00 && ev.data.packetState === State.LOGIN) {
                     let playerUUID = !!ev.data.playerUUID ? ev.data.playerUUID : "temp";
                     let playerName = ev.data.playerName;
-                    port.postMessage(new LoginSuccessPacket(playerUUID, playerName))
+                    port.postMessage(new ClientboundLoginSuccessPacket(playerUUID, playerName))
                     console.debug("Switching state for port " + port + " to PLAY");
                     portStates.set(port, State.PLAY);
+                    console.info("User at port " + port + " logging in with UUID " + playerUUID);
                     // Do something with the game server
                 }
                 // Disconnect Start Packet
-                if (ev.data.packet_id === 0x70 && ev.data.packet_state === State.PLAY) {
+                if (ev.data.packetId === 0x70 && ev.data.packetState === State.PLAY) {
                     console.info("User at port " + port + " requesting disconnect, closing connection.");
                     closeConnectionPort(port);
                 }
@@ -109,7 +112,11 @@ sw.onconnect = (evt) => {
         }
 
         port.onmessageerror = (ev) => {
-            oldconsole.error("Failed: " + ev)
+            if (eventLogger) {
+                oldconsole.error("Failed: " + ev)
+            } else {
+                console.error("Failed: " + ev)
+            }
         }
 
         port.start(); // Required when using addEventListener. Otherwise called implicitly by onmessage setter.
