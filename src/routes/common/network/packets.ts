@@ -113,7 +113,7 @@ export class ClientboundKickPacket implements Packet {
 }
 
 export class ClientboundKeepAlivePacket implements Packet {
-    packetName: string = "Serverbound Keep Alive";
+    packetName: string = "Clientbound Keep Alive";
     packetId: number = 0x12;
     packetState: State = State.PLAY;
     keepAliveID: number;

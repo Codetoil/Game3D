@@ -7,7 +7,7 @@
 /// <reference lib="es2020" />
 /// <reference lib="webworker" />
 
-import { ClientboundLoginSuccessPacket, ClientboundDisconnectPacket, ClientboundDisconnectSuccessPacket, ClientboundKickPacket, State } from "../../common/network/packets";
+import { ClientboundLoginSuccessPacket, ClientboundDisconnectPacket, ClientboundDisconnectSuccessPacket, ClientboundKickPacket, ClientboundKeepAlivePacket, State } from "../../common/network/packets";
 import { PROTOCOL as PROTOCOL } from "../../common/version";
 // import { EventLogger } from "./eventLogger"
 
@@ -21,16 +21,21 @@ let sw = self;
 // let eventLogger = console = new EventLogger(console);
 let ports = [];
 let portStates = new Map();
-let portHasGottenPacket = new Map();
+let portHasGottenKeepAlive = new Map();
+let portKeepAliveIds = new Map();
+let portIntervals = new Map();
 
 sw.onerror = (evt) => {
     console.error("Error: " + evt);
 }
 
 function disconnectPort(port) {
+    console.info("Closing connection with user at port " + port);
     port.close();
     portStates.delete(port);
-    portHasGottenPacket.delete(port);
+    portHasGottenKeepAlive.delete(port);
+    portKeepAliveIds.delete(port);
+    portIntervals.delete(port);
     if (portStates.size < 1) {
         console.info("All players offline, disconnecting...")
         sw.close();
@@ -55,7 +60,20 @@ function loginRefusePort(port, reason) {
 sw.onconnect = (evt) => {
     ports = evt.ports;
     portStates.set(evt.source, State.HANDSHAKING);
-    portHasGottenPacket.set(evt.source, State.HANDSHAKING);
+    portHasGottenKeepAlive.set(evt.source, false);
+    portIntervals.set(evt.source, setInterval(() => {
+        if (!portHasGottenKeepAlive.get(evt.source))
+        {
+            console.warn("User with port " + evt.source + " timed out, kicking.");
+            clearInterval(portIntervals.get(evt.source));
+            kickPlayerPort(evt.source, "Timeout");
+            return;
+        }
+        portHasGottenKeepAlive.set(evt.source, false)
+        let keepAliveId = Math.random();
+        portKeepAliveIds.set(evt.source, keepAliveId)
+        evt.source?.postMessage(new ClientboundKeepAlivePacket(keepAliveId));
+    }, 20000));
 
     evt.ports.forEach(port => {
         port.onmessage = (ev) => {
@@ -95,16 +113,24 @@ sw.onconnect = (evt) => {
                 if (ev.data.packetId === 0x00 && ev.data.packetState === State.LOGIN) {
                     let playerUUID = !!ev.data.playerUUID ? ev.data.playerUUID : "temp";
                     let playerName = ev.data.playerName;
-                    port.postMessage(new ClientboundLoginSuccessPacket(playerUUID, playerName))
+                    port.postMessage(new ClientboundLoginSuccessPacket(playerUUID, playerName, []))
                     console.debug("Switching state for port " + port + " to PLAY");
                     portStates.set(port, State.PLAY);
                     console.info("User at port " + port + " logging in with UUID " + playerUUID);
+                    let keepAliveId = Math.random();
+                    portKeepAliveIds.set(evt.source, keepAliveId)
+                    evt.source?.postMessage(new ClientboundKeepAlivePacket(keepAliveId));
                     // Do something with the game server
                 }
                 // Disconnect Start Packet
                 if (ev.data.packetId === 0x70 && ev.data.packetState === State.PLAY) {
                     console.info("User at port " + port + " requesting disconnect, closing connection.");
                     closeConnectionPort(port);
+                }
+                // Keep Alive Packet
+                if (ev.data.packetId === 0x23 && ev.data.packetState === State.PLAY) {
+                    console.debug("Recieved Keep-Alive from user at port " + port)
+                    portHasGottenKeepAlive.set(port, true);
                 }
             } else {
                 console.debug("Recieved: " + ev.data);
