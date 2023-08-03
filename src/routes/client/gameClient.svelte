@@ -6,8 +6,8 @@
   import * as DEVALUE from "devalue";
   import { onMount } from "svelte";
   import { Game } from "../common/game";
-  import { WorldClient } from "./worldClient";
-  import { ConnectClient } from "./connectClient";
+  import type { WorldClient } from "./worldClient";
+  import type { ConnectClient } from "./connectClient";
   import { ConnectClientLocal } from "./connectClientLocal";
 
   export class GameClient extends Game {

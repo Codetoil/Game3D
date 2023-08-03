@@ -3,9 +3,9 @@
  */
 
 import * as BABYLON from "@babylonjs/core";
-import { EntityServer } from "../server/entitySever";
+import type { EntityServer } from "../server/entitySever";
 import type { InputController } from "../common/inputController";
-import { WorldServer } from "../server/worldServer";
+import type { WorldServer } from "../server/worldServer";
 import { PlayerClient } from "./entityClient";
 import { WorldClient } from "./worldClient";
 

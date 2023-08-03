@@ -2,7 +2,10 @@
  * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
 
-import * as BABYLON from "@babylonjs/core";
+/**
+ * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ */
+import type * as BABYLON from "@babylonjs/core";
 import { Mixin } from "ts-mixer";
 import { PlayerInputController } from "./clientInputController";
 import { WorldClient } from "./worldClient";

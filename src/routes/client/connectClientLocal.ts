@@ -1,11 +1,14 @@
 /** 
  *  ALL RIGHTS RESERVED Codetoil (c) 2021-2023 
  */
-import {
+/**
+ *  ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ */
+import type {
   ServerboundDisconnectStartPacket,
   ClientboundDisconnectSuccessPacket,
   State,
-  type Packet,
+  Packet,
   ClientboundLoginSuccessPacket,
   ServerboundHandshakePacket,
   ServerboundLoginStartPacket,
