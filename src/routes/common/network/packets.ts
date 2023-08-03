@@ -14,6 +14,7 @@ export interface Property {
 export enum State {
     HANDSHAKING,
     STATUS,
+    CONFIG,
     LOGIN,
     PLAY
 }

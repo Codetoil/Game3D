@@ -2,8 +2,11 @@
  * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
 
-import * as BABYLON from "@babylonjs/core";
-import { World } from "./world";
+/**
+ * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ */
+import type * as BABYLON from "@babylonjs/core";
+import type { World } from "./world";
 
 export abstract class Game {
     public abstract name: string;
@@ -13,9 +16,9 @@ export abstract class Game {
     public camera!: BABYLON.Camera;
     public started: boolean = false;
     public stopped: boolean = false;
-    public abstract async createEngine(): Promise<BABYLON.Engine>;
-    public abstract async createScene(): Promise<BABYLON.Scene>;
-    public abstract async setMenuCamera(): void;
+    public abstract createEngine(): Promise<BABYLON.Engine>;
+    public abstract createScene(): Promise<BABYLON.Scene>;
+    public abstract setMenuCamera(): void;
 
     public init(resolve: (value: Game | PromiseLike<Game>) => void, reject: (reason?: any) => void) {
         this.createEngine()

@@ -4,8 +4,8 @@
 
 import * as BABYLON from "@babylonjs/core";
 import { Entity, Player } from "../common/entity";
-import { Ground, Wall } from "../common/world";
-import { WorldServer } from "./worldServer";
+import type { Ground, Wall } from "../common/world";
+import type { WorldServer } from "./worldServer";
 import { Mixin } from "ts-mixer";
 
 export abstract class EntityServer extends Entity {

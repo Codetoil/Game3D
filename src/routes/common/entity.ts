@@ -4,7 +4,7 @@
 
 import * as BABYLON from "@babylonjs/core";
 import type { InputController } from "./inputController";
-import { Wall, World } from "./world";
+import type { Wall, World } from "./world";
 
 export abstract class Entity {
     public mesh!: BABYLON.Mesh;
