@@ -1,9 +1,8 @@
 /**
  * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
-/**
- * Heavily inspired by the M*necraft Networking Protocol 
- */
+
+import * as NetSerializer from "net-serializer";
 
 export interface Property {
     name: string;
@@ -14,28 +13,47 @@ export interface Property {
 export enum State {
     HANDSHAKING,
     STATUS,
-    CONFIG,
     LOGIN,
+    CONFIG,
     PLAY
 }
 
 export interface Packet {
-    packetName: string;
-    packetId: number;
-    packetState: State;
+    createPacket(): ArrayBuffer;
 }
+
+const packetInfoType = {
+    packetName: { type: 'string' },
+    packetId: { type: 'uint8' },
+    packetState: { type: 'uint8' }
+};
 
 // To Server
 export class ServerboundHandshakePacket implements Packet {
-    packetName: string = "Serverbound Handshake";
-    packetId: number = 0x00;
-    packetState: State = State.HANDSHAKING;
+    packetInfo = {
+        packetName: "Serverbound Handshake",
+        packetId: 0x00,
+        packetState: State.HANDSHAKING.valueOf()
+    };
     protocol: number;
     nextState: State;
 
     constructor(protocol: number, nextState: State) {
         this.protocol = protocol;
         this.nextState = nextState;
+    }
+
+    public createPacket(): ArrayBuffer {
+        return NetSerializer.pack({
+            packetInfo: this.packetInfo,
+            protocol: { type: 'uint32' },
+            nextState: { type: 'uint8' }
+        },
+        {
+            packetInfo: packetInfoType,
+            protocol: this.protocol,
+            nextState: this.nextState.valueOf()
+        })
     }
 }
 

@@ -38,7 +38,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const COREPACK_ROOT: string;
 	export const DriverData: string;
-	export const EFC_16860: string;
+	export const EFC_12060: string;
 	export const GIT_ASKPASS: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
@@ -68,6 +68,7 @@ declare module '$env/static/private' {
 	export const npm_lifecycle_event: string;
 	export const npm_lifecycle_script: string;
 	export const npm_node_execpath: string;
+	export const npm_package_dependencies_net_serializer: string;
 	export const npm_package_dependencies_ts_mixer: string;
 	export const npm_package_dependencies_uuid: string;
 	export const npm_package_dependencies_xss: string;
@@ -179,7 +180,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		COREPACK_ROOT: string;
 		DriverData: string;
-		EFC_16860: string;
+		EFC_12060: string;
 		GIT_ASKPASS: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;
@@ -209,6 +210,7 @@ declare module '$env/dynamic/private' {
 		npm_lifecycle_event: string;
 		npm_lifecycle_script: string;
 		npm_node_execpath: string;
+		npm_package_dependencies_net_serializer: string;
 		npm_package_dependencies_ts_mixer: string;
 		npm_package_dependencies_uuid: string;
 		npm_package_dependencies_xss: string;

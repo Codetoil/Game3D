@@ -1,6 +1,7 @@
 /** 
  *  ALL RIGHTS RESERVED Codetoil (c) 2021-2023 
  */
+
 import {
     ServerboundDisconnectStartPacket,
     ClientboundLoginSuccessPacket,
@@ -69,7 +70,7 @@ export class ConnectClient {
             // Login Success Packet
             if (packet.packetId === 0x02 && packet.packetState === State.LOGIN) {
                 console.info("Login successful! Username: \"" + (packet as ClientboundLoginSuccessPacket).username
-                    + "\" UUID: " + packet.uuid)
+                    + "\" UUID: " + (packet as ClientboundLoginSuccessPacket).uuid)
                 console.info("Given User properties: [" + (packet as ClientboundLoginSuccessPacket).properties + "]")
                 console.debug("Switching user state to PLAY...")
                 this.currentState = State.PLAY

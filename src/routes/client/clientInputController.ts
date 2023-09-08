@@ -81,16 +81,33 @@ export class PlayerInputController implements InputController {
             ) as BABYLON.DeviceSource<BABYLON.DeviceType.Switch>;
             this.sprintHeld =
                 this.sprintHeld ||
-                gamepadSource.getInput(3) === 1 ||
-                gamepadSource.getInput(2) === 1;
+                gamepadSource.getInput(BABYLON.SwitchInput.A) === 1 ||
+                gamepadSource.getInput(BABYLON.SwitchInput.B) === 1;
             this.setJoystickIfBigger(
-                -gamepadSource.getInput(23),
-                gamepadSource.getInput(22)
+                -gamepadSource.getInput(BABYLON.SwitchInput.LStickXAxis),
+                gamepadSource.getInput(BABYLON.SwitchInput.LStickYAxis)
             );
             this.jumpPressed =
                 this.jumpPressed ||
-                gamepadSource.getInput(0) === 1 ||
-                gamepadSource.getInput(1) === 1;
+                gamepadSource.getInput(BABYLON.SwitchInput.X) === 1 ||
+                gamepadSource.getInput(BABYLON.SwitchInput.Y) === 1;
+        }
+        if (this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Xbox)) {
+            let gamepadSource = this.deviceSourceManager.getDeviceSource(
+                BABYLON.DeviceType.Xbox
+            ) as BABYLON.DeviceSource<BABYLON.DeviceType.Xbox>;
+            this.sprintHeld =
+                this.sprintHeld ||
+                gamepadSource.getInput(BABYLON.XboxInput.B) === 1 ||
+                gamepadSource.getInput(BABYLON.XboxInput.A) === 1;
+            this.setJoystickIfBigger(
+                -gamepadSource.getInput(BABYLON.XboxInput.LStickXAxis),
+                gamepadSource.getInput(BABYLON.XboxInput.LStickYAxis)
+            );
+            this.jumpPressed =
+                this.jumpPressed ||
+                gamepadSource.getInput(BABYLON.XboxInput.X) === 1 ||
+                gamepadSource.getInput(BABYLON.XboxInput.Y) === 1;
         }
         if (
             this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualSense)
@@ -100,16 +117,37 @@ export class PlayerInputController implements InputController {
             ) as BABYLON.DeviceSource<BABYLON.DeviceType.DualSense>;
             this.sprintHeld =
                 this.sprintHeld ||
-                gamepadSource.getInput(3) === 1 ||
-                gamepadSource.getInput(2) === 1;
+                gamepadSource.getInput(BABYLON.DualSenseInput.Square) === 1 ||
+                gamepadSource.getInput(BABYLON.DualSenseInput.Triangle) === 1;
             this.setJoystickIfBigger(
-                -gamepadSource.getInput(19),
-                gamepadSource.getInput(18)
+                -gamepadSource.getInput(BABYLON.DualSenseInput.LStickXAxis),
+                gamepadSource.getInput(BABYLON.DualSenseInput.LStickYAxis)
             );
             this.jumpPressed =
                 this.jumpPressed ||
-                gamepadSource.getInput(0) === 1 ||
-                gamepadSource.getInput(1) === 1;
+                gamepadSource.getInput(BABYLON.DualSenseInput.Circle) === 1 ||
+                gamepadSource.getInput(BABYLON.DualSenseInput.Cross) === 1;
+        }
+
+        
+        if (
+            this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualShock)
+        ) {
+            let gamepadSource = this.deviceSourceManager.getDeviceSource(
+                BABYLON.DeviceType.DualShock
+            ) as BABYLON.DeviceSource<BABYLON.DeviceType.DualShock>;
+            this.sprintHeld =
+                this.sprintHeld ||
+                gamepadSource.getInput(BABYLON.DualShockInput.Square) === 1 ||
+                gamepadSource.getInput(BABYLON.DualShockInput.Triangle) === 1;
+            this.setJoystickIfBigger(
+                -gamepadSource.getInput(BABYLON.DualShockInput.LStickXAxis),
+                gamepadSource.getInput(BABYLON.DualShockInput.LStickYAxis)
+            );
+            this.jumpPressed =
+                this.jumpPressed ||
+                gamepadSource.getInput(BABYLON.DualShockInput.Circle) === 1 ||
+                gamepadSource.getInput(BABYLON.DualShockInput.Cross) === 1;
         }
         this.joystick.rotateByQuaternionToRef(
             worldClient.camera.rotationQuaternion,

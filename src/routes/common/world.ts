@@ -2,9 +2,6 @@
  * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
  */
 
-/**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
- */
 import type * as BABYLON from "@babylonjs/core";
 import type { Game } from "./game";
 

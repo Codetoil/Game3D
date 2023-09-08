@@ -1,27 +1,15 @@
 /** 
  *  ALL RIGHTS RESERVED Codetoil (c) 2021-2023 
  */
-/**
- *  ALL RIGHTS RESERVED Codetoil (c) 2021-2023
- */
+
 import type {
-  ServerboundDisconnectStartPacket,
-  ClientboundDisconnectSuccessPacket,
-  State,
   Packet,
-  ClientboundLoginSuccessPacket,
-  ServerboundHandshakePacket,
-  ServerboundLoginStartPacket,
-  ClientboundDisconnectPacket,
 } from "../common/network/packets";
 import serverWorkerURL from "./server/server-worker.js?sharedworker&url";
-import { PROTOCOL } from "../common/version";
-import type { Game } from "../common/game";
-import { WorldClient } from "./worldClient";
 import { ConnectClient } from "./connectClient";
 
 export class ConnectClientLocal extends ConnectClient {
-  protected worker?: SharedWorker = null;
+  protected worker?: SharedWorker = undefined;
 
   public send(packet: Packet): void {
     if (!this.worker) {
@@ -67,7 +55,7 @@ export class ConnectClientLocal extends ConnectClient {
       return;
     }
     this.worker.port.close();
-    this.worker = null;
+    this.worker = undefined;
     super.disconnect()
   }
 
