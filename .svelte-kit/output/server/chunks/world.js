@@ -1,4 +1,3 @@
-import "@babylonjs/core";
 class Game {
   constructor() {
     this.started = false;
@@ -31,11 +30,31 @@ class Game {
     );
   }
   tick() {
-    if (!this.started || this.stopped || !(this.world !== null))
+    if (!this.started || this.stopped || !(this.world !== void 0))
       return;
     this.world.tick();
   }
 }
+class Ground {
+  setMesh(mesh) {
+    this.mesh = mesh;
+    return this;
+  }
+}
+class Wall {
+  setMesh(mesh) {
+    this.mesh = mesh;
+    return this;
+  }
+}
+class World {
+  constructor(game) {
+    this.game = game;
+  }
+}
 export {
-  Game as G
+  Game as G,
+  World as W,
+  Ground as a,
+  Wall as b
 };

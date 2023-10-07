@@ -1,31 +1,45 @@
 /**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ *  Game3D, a 3D Platformer built for the web.
+ *  Copyright (C) 2021-2023  Codetoil
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import * as NetSerializer from "net-serializer";
 import * as uuid from "uuid"
 
 export class Property {
-    private name_: string;
+    public name_: string;
     private value_: string;
     private signature_?: string;
 
-    constructor(name: string, value: string, signature?: string)
+    public constructor(name: string, value: string, signature?: string)
     {
         this.name_ = name;
         this.value_ = value;
         this.signature_ = signature;
     }
 
-    get name(): string {
+    public get name(): string {
         return this.name_;
     }
 
-    get value(): string {
+    public get value(): string {
         return this.value_;
     }
 
-    get signature(): string | undefined {
+    public get signature(): string | undefined {
         return this.signature_;
     }
 
@@ -78,6 +92,11 @@ type StatePacketType = number;
 const stateType = { type: 'uint8' }
 
 export interface Packet {
+    genericPacketInfo: GenericPacketInfo;
+    packetData: PacketData;
+}
+
+export interface PacketData {
     pack(): ArrayBuffer;
     unpack(buffer: ArrayBuffer): void;
 }
@@ -94,21 +113,34 @@ export type GenericPacketInfoPacketType = {
     packetState: StatePacketType
 }
 
-const genericPacketInfoType = {
+export const genericPacketInfoType = {
     packetName: { type: 'string' },
     packetId: { type: 'uint8' },
     packetState: stateType
 };
 
+export function getPacketFromGPIServerbound(genericPacketInfo: GenericPacketInfo)
+{
+    if (genericPacketInfo.packetId === 0x00 && genericPacketInfo.packetState === State.HANDSHAKING) return ServerboundHandshakePacketData;
+    if (genericPacketInfo.packetId === 0x00 && genericPacketInfo.packetState === State.LOGIN) return ServerboundLoginStartPacketData;
+    if (genericPacketInfo.packetId === 0x70 && genericPacketInfo.packetState === State.PLAY) return ServerboundDisconnectStartPacketData;
+    if (genericPacketInfo.packetId === 0x23 && genericPacketInfo.packetState === State.PLAY) return ServerboundKeepAlivePacketData;
+}
+
+export function getPacketFromGPIClientbound(genericPacketInfo: GenericPacketInfo)
+{
+    if (genericPacketInfo.packetId === 0x00 && genericPacketInfo.packetState === State.LOGIN) return ClientboundDisconnectPacketData;
+    if (genericPacketInfo.packetId === 0x02 && genericPacketInfo.packetState === State.LOGIN) return ClientboundLoginSuccessPacketData;
+}
+
 // To Server
-export class ServerboundHandshakePacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ServerboundHandshakePacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Serverbound Handshake",
         packetId: 0x00,
         packetState: State.HANDSHAKING.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         protocol: { type: 'uint32' },
         nextState: stateType
     };
@@ -121,9 +153,8 @@ export class ServerboundHandshakePacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ServerboundHandshakePacket.packetInfoType,
+        return NetSerializer.pack(ServerboundHandshakePacketData.packetInfoType,
             {
-                packetInfo: ServerboundHandshakePacket.genericPacketInfo,
                 protocol: this.protocol,
                 nextState: this.nextState.valueOf()
             });
@@ -131,23 +162,21 @@ export class ServerboundHandshakePacket implements Packet {
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType
             protocol: number,
             nextState: StatePacketType
-        } = NetSerializer.unpack(buffer, ServerboundHandshakePacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ServerboundHandshakePacketData.packetInfoType);
         this.protocol = value.protocol;
         this.nextState = value.nextState;
     }
 }
 
-export class ServerboundLoginStartPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ServerboundLoginStartPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Serverbound Login Start",
         packetId: 0x00,
         packetState: State.LOGIN.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         playerName: { type: 'string' },
         playerUUID: uuidType
     };
@@ -160,9 +189,8 @@ export class ServerboundLoginStartPacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ServerboundLoginStartPacket.packetInfoType,
+        return NetSerializer.pack(ServerboundLoginStartPacketData.packetInfoType,
             {
-                packetInfo: ServerboundLoginStartPacket.packetInfoType,
                 playerName: this.playerName,
                 playerUUID: !!this.playerUUID ? uuid.parse(this.playerUUID) : []
             });
@@ -170,10 +198,9 @@ export class ServerboundLoginStartPacket implements Packet {
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType
             playerName: string,
             playerUUID: UUIDPacketType
-        } = NetSerializer.unpack(buffer, ServerboundLoginStartPacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ServerboundLoginStartPacketData.packetInfoType);
         this.playerName = value.playerName;
         if (value.playerUUID.length != 0) {
             this.playerUUID = uuid.stringify(value.playerUUID)
@@ -181,38 +208,34 @@ export class ServerboundLoginStartPacket implements Packet {
     }
 }
 
-export class ServerboundDisconnectStartPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ServerboundDisconnectStartPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Serverbound Disconnect Start",
         packetId: 0x70,
         packetState: State.PLAY.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType
+    public static packetInfoType = {
     };
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ServerboundDisconnectStartPacket.packetInfoType,
+        return NetSerializer.pack(ServerboundDisconnectStartPacketData.packetInfoType,
             {
-                packetInfo: ServerboundDisconnectStartPacket.packetInfoType
             });
     }
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType
-        } = NetSerializer.unpack(buffer, ServerboundDisconnectStartPacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ServerboundDisconnectStartPacketData.packetInfoType);
     }
 }
 
-export class ServerboundKeepAlivePacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ServerboundKeepAlivePacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Serverbound Keep Alive",
         packetId: 0x23,
         packetState: State.PLAY.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         keepAliveID: { type: 'uint32' }
     };
     keepAliveID: number;
@@ -222,30 +245,58 @@ export class ServerboundKeepAlivePacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ServerboundKeepAlivePacket.packetInfoType,
+        return NetSerializer.pack(ServerboundKeepAlivePacketData.packetInfoType,
             {
-                packetInfo: ServerboundKeepAlivePacket.packetInfoType
+                keepAliveID: this.keepAliveID
             });
     }
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType,
             keepAliveID: number
-        } = NetSerializer.unpack(buffer, ServerboundKeepAlivePacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ServerboundKeepAlivePacketData.packetInfoType);
         this.keepAliveID = value.keepAliveID;
     }
 }
 
 // To Client
-export class ClientboundLoginSuccessPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ClientboundDisconnectPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
+        packetName: "Clientbound Disconnect at Login",
+        packetId: 0x00,
+        packetState: State.LOGIN.valueOf()
+    };
+    public static packetInfoType = {
+        reason: { type: 'string' }
+    };
+    reason: string;
+
+    constructor(reason: string) {
+        this.reason = reason;
+    }
+
+    public pack(): ArrayBuffer {
+        return NetSerializer.pack(ClientboundDisconnectPacketData.packetInfoType,
+            {
+                reason: this.reason
+            });
+    }
+
+    public unpack(buffer: ArrayBuffer): void {
+        const value: {
+            reason: string
+        } = NetSerializer.unpack(buffer, ClientboundDisconnectPacketData.packetInfoType);
+        this.reason = value.reason;
+    }
+}
+
+export class ClientboundLoginSuccessPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Clientbound Login Success",
         packetId: 0x02,
         packetState: State.LOGIN.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         uuid: uuidType,
         username: { type: 'string' },
         properties: [propertyType]
@@ -261,9 +312,8 @@ export class ClientboundLoginSuccessPacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ClientboundLoginSuccessPacket.packetInfoType,
+        return NetSerializer.pack(ClientboundLoginSuccessPacketData.packetInfoType,
             {
-                packetInfo: ClientboundLoginSuccessPacket.packetInfoType,
                 uuid: uuid.parse(this.uuid),
                 username: this.username,
                 properties: this.properties.map((property) => property.pack())
@@ -272,11 +322,10 @@ export class ClientboundLoginSuccessPacket implements Packet {
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType,
             uuid: UUIDPacketType,
             username: string,
             properties: PropertyPacketType[]
-        } = NetSerializer.unpack(buffer, ClientboundLoginSuccessPacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ClientboundLoginSuccessPacketData.packetInfoType);
         this.uuid = uuid.stringify(value.uuid)
         this.username = value.username;
         this.properties = value.properties.map((propertyPacketType) => {
@@ -287,71 +336,34 @@ export class ClientboundLoginSuccessPacket implements Packet {
     }
 }
 
-export class ClientboundDisconnectPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
-        packetName: "Clientbound Disconnect at Login",
-        packetId: 0x00,
-        packetState: State.LOGIN.valueOf()
-    };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
-        reason: { type: 'string' }
-    };
-    reason: string;
-
-    constructor(reason: string) {
-        this.reason = reason;
-    }
-
-    public pack(): ArrayBuffer {
-        return NetSerializer.pack(ClientboundDisconnectPacket.packetInfoType,
-            {
-                packetInfo: ClientboundDisconnectPacket.packetInfoType,
-                reason: this.reason
-            });
-    }
-
-    public unpack(buffer: ArrayBuffer): void {
-        const value: {
-            packetInfo: GenericPacketInfoPacketType,
-            reason: string
-        } = NetSerializer.unpack(buffer, ClientboundDisconnectPacket.packetInfoType);
-        this.reason = value.reason;
-    }
-}
-
-export class ClientboundDisconnectSuccessPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ClientboundDisconnectSuccessPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Clientbound Disconnect Success",
         packetId: 0x71,
         packetState: State.PLAY.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType
+    public static packetInfoType = {
     };
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ClientboundDisconnectSuccessPacket.packetInfoType,
+        return NetSerializer.pack(ClientboundDisconnectSuccessPacketData.packetInfoType,
             {
-                packetInfo: ClientboundDisconnectSuccessPacket.packetInfoType
             });
     }
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType
-        } = NetSerializer.unpack(buffer, ClientboundDisconnectSuccessPacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ClientboundDisconnectSuccessPacketData.packetInfoType);
     }
 }
 
-export class ClientboundKickPacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ClientboundKickPacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Clientbound Kick",
         packetId: 0x72,
         packetState: State.PLAY.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         reason: { type: 'string' }
     };
     reason: string;
@@ -361,30 +373,27 @@ export class ClientboundKickPacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ClientboundKickPacket.packetInfoType,
+        return NetSerializer.pack(ClientboundKickPacketData.packetInfoType,
             {
-                packetInfo: ClientboundKickPacket.packetInfoType,
                 reason: this.reason
             });
     }
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfoPacketType
             reason: string
-        } = NetSerializer.unpack(buffer, ClientboundKickPacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ClientboundKickPacketData.packetInfoType);
         this.reason = value.reason;
     }
 }
 
-export class ClientboundKeepAlivePacket implements Packet {
-    static genericPacketInfo: GenericPacketInfo = {
+export class ClientboundKeepAlivePacketData implements PacketData {
+    public static genericPacketInfo: GenericPacketInfo = {
         packetName: "Clientbound Keep Alive",
         packetId: 0x12,
         packetState: State.PLAY.valueOf()
     };
-    static packetInfoType = {
-        packetInfo: genericPacketInfoType,
+    public static packetInfoType = {
         keepAliveID: { type: 'uint32' }
     };
     keepAliveID: number;
@@ -394,18 +403,16 @@ export class ClientboundKeepAlivePacket implements Packet {
     }
 
     public pack(): ArrayBuffer {
-        return NetSerializer.pack(ClientboundKeepAlivePacket.packetInfoType,
+        return NetSerializer.pack(ClientboundKeepAlivePacketData.packetInfoType,
             {
-                packetInfo: ClientboundKeepAlivePacket.packetInfoType,
                 keepAliveID: this.keepAliveID
             });
     }
 
     public unpack(buffer: ArrayBuffer): void {
         const value: {
-            packetInfo: GenericPacketInfo,
             keepAliveID: number
-        } = NetSerializer.unpack(buffer, ClientboundKeepAlivePacket.packetInfoType);
+        } = NetSerializer.unpack(buffer, ClientboundKeepAlivePacketData.packetInfoType);
         this.keepAliveID = value.keepAliveID;
     }
 }

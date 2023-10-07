@@ -1,16 +1,27 @@
 /**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ *  Game3D, a 3D Platformer built for the web.
+ *  Copyright (C) 2021-2023  Codetoil
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
- */
 import type * as BABYLON from "@babylonjs/core";
 import type { World } from "./world";
 
 export abstract class Game {
     public abstract name: string;
-    public world!: World;
+    public world!: World | undefined;
     public engine!: BABYLON.Engine;
     public scene!: BABYLON.Scene;
     public camera!: BABYLON.Camera;
@@ -50,7 +61,7 @@ export abstract class Game {
     }
 
     public tick(): void {
-        if (!this.started || this.stopped || !(this.world !== null)) return;
+        if (!this.started || this.stopped || !(this.world !== undefined)) return;
         this.world.tick();
     }
 }

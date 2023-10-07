@@ -1,4 +1,4 @@
-import { c as create_ssr_component, s as setContext, v as validate_component, m as missing_component } from "./index2.js";
+import { c as create_ssr_component, a as setContext, v as validate_component, m as missing_component } from "./ssr.js";
 let base = "";
 let assets = base;
 const initial = { base, assets };
@@ -47,15 +47,14 @@ const Root = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.data_1(data_1);
   let $$settled;
   let $$rendered;
+  let previous_head = $$result.head;
   do {
     $$settled = true;
+    $$result.head = previous_head;
     {
       stores.page.set(page);
     }
-    $$rendered = `
-
-
-${constructors[1] ? `${validate_component(constructors[0] || missing_component, "svelte:component").$$render(
+    $$rendered = `  ${constructors[1] ? `${validate_component(constructors[0] || missing_component, "svelte:component").$$render(
       $$result,
       { data: data_0, this: components[0] },
       {
@@ -89,9 +88,7 @@ ${constructors[1] ? `${validate_component(constructors[0] || missing_component, 
         }
       },
       {}
-    )}`}
-
-${``}`;
+    )}`} ${``}`;
   } while (!$$settled);
   return $$rendered;
 });
@@ -102,13 +99,14 @@ const options = {
   track_server_fetches: false,
   embedded: false,
   env_public_prefix: "PUBLIC_",
+  env_private_prefix: "",
   hooks: null,
   // added lazily, via `get_hooks`
   preload_strategy: "modulepreload",
   root: Root,
   service_worker: false,
   templates: {
-    app: ({ head, body, assets: assets2, nonce, env }) => '<!-- \r\n    ALL RIGHTS RESERVED Codetoil (c) 2021-2023 \r\n-->\r\n\r\n<!DOCTYPE html>\r\n<html lang="en">\r\n\r\n<head>\r\n	<meta charset="utf-8" />\r\n	<link rel="apple-touch-icon" sizes="180x180" href="' + assets2 + '/apple-touch-icon.png">\r\n	<link rel="icon" type="image/png" sizes="32x32" href="' + assets2 + '/favicon-32x32.png">\r\n	<link rel="icon" type="image/png" sizes="16x16" href="' + assets2 + '/favicon-16x16.png">\r\n	<link rel="manifest" href="' + assets2 + '/site.webmanifest">\r\n	<meta name="viewport" content="width=device-width" />\r\n	' + head + '\r\n</head>\r\n\r\n<body data-sveltekit-preload-data="hover">\r\n	<div style="display: contents">' + body + "</div>\r\n</body>\r\n\r\n</html>",
+    app: ({ head, body, assets: assets2, nonce, env }) => '<!-- \r\n    Game3D, a 3D Platformer built for the web.\r\n    Copyright (C) 2021-2023  Codetoil\r\n\r\n    This program is free software: you can redistribute it and/or modify\r\n    it under the terms of the GNU General Public License as published by\r\n    the Free Software Foundation, either version 3 of the License, or\r\n    (at your option) any later version.\r\n\r\n    This program is distributed in the hope that it will be useful,\r\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n    GNU General Public License for more details.\r\n\r\n    You should have received a copy of the GNU General Public License\r\n    along with this program.  If not, see <https://www.gnu.org/licenses/>.\r\n-->\r\n\r\n<!DOCTYPE html>\r\n<html lang="en">\r\n\r\n<head>\r\n	<meta charset="utf-8" />\r\n	<link rel="apple-touch-icon" sizes="180x180" href="' + assets2 + '/apple-touch-icon.png">\r\n	<link rel="icon" type="image/png" sizes="32x32" href="' + assets2 + '/favicon-32x32.png">\r\n	<link rel="icon" type="image/png" sizes="16x16" href="' + assets2 + '/favicon-16x16.png">\r\n	<link rel="manifest" href="' + assets2 + '/site.webmanifest">\r\n	<meta name="viewport" content="width=device-width" />\r\n	' + head + '\r\n</head>\r\n\r\n<body data-sveltekit-preload-data="hover">\r\n	<div style="display: contents">' + body + "</div>\r\n</body>\r\n\r\n</html>",
     error: ({ status, message }) => '<!DOCTYPE html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<title>' + message + `</title>
 
 		<style>
@@ -124,6 +122,7 @@ const options = {
 				align-items: center;
 				justify-content: center;
 				height: 100vh;
+				margin: 0;
 			}
 
 			.error {
@@ -169,7 +168,7 @@ const options = {
 		<div class="error">
 			<span class="status">` + status + '</span>\n			<div class="message">\n				<h1>' + message + "</h1>\n			</div>\n		</div>\n	</body>\n</html>\n"
   },
-  version_hash: "1hriugn"
+  version_hash: "f4b9q4"
 };
 function get_hooks() {
   return {};
@@ -177,12 +176,12 @@ function get_hooks() {
 export {
   assets as a,
   base as b,
-  set_assets as c,
-  set_building as d,
-  set_private_env as e,
+  set_public_env as c,
+  set_assets as d,
+  set_building as e,
   get_hooks as g,
   options as o,
   public_env as p,
   reset as r,
-  set_public_env as s
+  set_private_env as s
 };

@@ -16,7 +16,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export let PROTOCOL = 0x0
+// https://stackoverflow.com/questions/62038161/typescript-mutability-and-inversion-of-readonlyt
+// licensed under CC BY-SA
+// Accessed 2023 Oct 3
 
-export let CLIENT_VERSION = "0.1.0"
-export let SERVER_VERSION = "0.1.0"
+export type Mutable<T> = {
+    -readonly [P in keyof T]: T[P];
+};

@@ -1,4 +1,3 @@
-# 3d_game
+# Game3D
 
-This is a work-in-progress project created by my sister Elizabeth and I. It is currentely in
-elementery stages. Version 0.1.0
+Game3D, a 3D Platformer built for the web. It is currently in elementary stages. Version 0.1.0

@@ -13,11 +13,11 @@ export const load = (async ({ params }) => {
             if (
                 value.started &&
                 !value.stopped &&
-                value.world.scene &&
-                value.world.scene.activeCamera
+                value.world?.game.scene &&
+                value.world?.game.scene.activeCamera
             ) {
                 try {
-                    value.world.scene.render();
+                    value.world?.game.scene.render();
                 } catch (e: any) {
                     console.error(e);
                     value.stopped = true;

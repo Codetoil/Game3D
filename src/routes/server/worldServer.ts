@@ -1,5 +1,19 @@
 /**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ *  Game3D, a 3D Platformer built for the web.
+ *  Copyright (C) 2021-2023  Codetoil
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import * as BABYLON from "@babylonjs/core";
@@ -21,7 +35,7 @@ export class WorldServer extends World {
             { width: 20.0, depth: 20.0, height: 0.5 },
             this.game.scene
         );
-        ground.material = new BABYLON.StandardMaterial("groundMat", this.scene);
+        ground.material = new BABYLON.StandardMaterial("groundMat", this.game.scene);
         (ground.material as BABYLON.StandardMaterial).diffuseColor =
             new BABYLON.Color3(1, 1, 1);
         ground.material.backFaceCulling = false;
@@ -34,7 +48,7 @@ export class WorldServer extends World {
             { width: 15, height: 15, depth: 0.75 },
             this.game.scene
         );
-        wall.material = new BABYLON.StandardMaterial("wallMat", this.scene);
+        wall.material = new BABYLON.StandardMaterial("wallMat", this.game.scene);
         (wall.material as BABYLON.StandardMaterial).diffuseColor =
             new BABYLON.Color3(1, 1, 1);
         wall.material.backFaceCulling = false;
@@ -67,7 +81,7 @@ export class WorldServer extends World {
             this.game.scene
         );
         dbox.position = wall.position;
-        dbox.material = new BABYLON.StandardMaterial("dboxMat", this.scene);
+        dbox.material = new BABYLON.StandardMaterial("dboxMat", this.game.scene);
         (dbox.material as BABYLON.StandardMaterial).diffuseColor =
             new BABYLON.Color3(0, 1, 1);
         dbox.material.backFaceCulling = false;

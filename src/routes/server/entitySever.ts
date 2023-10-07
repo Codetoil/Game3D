@@ -1,5 +1,19 @@
 /**
- * ALL RIGHTS RESERVED Codetoil (c) 2021-2023
+ *  Game3D, a 3D Platformer built for the web.
+ *  Copyright (C) 2021-2023  Codetoil
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import * as BABYLON from "@babylonjs/core";
@@ -86,8 +100,8 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
         if (!this.facingDirection) return;
         let ray: BABYLON.Ray = new BABYLON.Ray(this.pos, this.facingDirection, 1);
         let rayHelper: BABYLON.RayHelper = new BABYLON.RayHelper(ray);
-        rayHelper.show(this.world.scene, BABYLON.Color3.Red());
-        let hitNullable: BABYLON.Nullable<BABYLON.PickingInfo> = this.world.scene.pickWithRay(ray, (mesh: BABYLON.AbstractMesh) => {
+        rayHelper.show(this.world.game.scene, BABYLON.Color3.Red());
+        let hitNullable: BABYLON.Nullable<BABYLON.PickingInfo> = this.world.game.scene.pickWithRay(ray, (mesh: BABYLON.AbstractMesh) => {
             return this.world.walls.map((wall1) => wall1.mesh).includes(mesh);
         });
         if (!hitNullable) return;
@@ -102,7 +116,7 @@ export abstract class PlayerServer extends Mixin(EntityServer, Player) {
             if (!hit.pickedPoint) return;
             let rayNormal = new BABYLON.Ray(hit.pickedPoint, normalVector, 1);
             new BABYLON.RayHelper(rayNormal).show(
-                this.world.scene,
+                this.world.game.scene,
                 BABYLON.Color3.Blue()
             );
             let normal: BABYLON.Quaternion = new BABYLON.Quaternion(

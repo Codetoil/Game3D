@@ -10,19 +10,18 @@ function run_all(fns) {
   fns.forEach(run);
 }
 function safe_not_equal(a, b) {
-  return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
+  return a != a ? b == b : a !== b || a && typeof a === "object" || typeof a === "function";
 }
 function subscribe(store, ...callbacks) {
   if (store == null) {
+    for (const callback of callbacks) {
+      callback(void 0);
+    }
     return noop;
   }
   const unsub = store.subscribe(...callbacks);
   return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
 }
-/* @__PURE__ */ new Set();
-const globals = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : global;
-"WeakMap" in globals ? /* @__PURE__ */ new WeakMap() : void 0;
-/* @__PURE__ */ new Map();
 let current_component;
 function set_current_component(component) {
   current_component = component;
@@ -39,36 +38,6 @@ function setContext(key, context) {
 function getContext(key) {
   return get_current_component().$$.context.get(key);
 }
-/* @__PURE__ */ new Set();
-/* @__PURE__ */ new Set();
-const _boolean_attributes = [
-  "allowfullscreen",
-  "allowpaymentrequest",
-  "async",
-  "autofocus",
-  "autoplay",
-  "checked",
-  "controls",
-  "default",
-  "defer",
-  "disabled",
-  "formnovalidate",
-  "hidden",
-  "inert",
-  "ismap",
-  "loop",
-  "multiple",
-  "muted",
-  "nomodule",
-  "novalidate",
-  "open",
-  "playsinline",
-  "readonly",
-  "required",
-  "reversed",
-  "selected"
-];
-/* @__PURE__ */ new Set([..._boolean_attributes]);
 const ATTR_REGEX = /[&"]/g;
 const CONTENT_REGEX = /[&<]/g;
 function escape(value, is_attr = false) {
@@ -92,7 +61,9 @@ function validate_component(component, name) {
   if (!component || !component.$$render) {
     if (name === "svelte:component")
       name += " this={...}";
-    throw new Error(`<${name}> is not a valid SSR component. You may need to review your build config to ensure that dependencies are compiled, rather than imported as pre-compiled modules. Otherwise you may need to fix a <${name}>.`);
+    throw new Error(
+      `<${name}> is not a valid SSR component. You may need to review your build config to ensure that dependencies are compiled, rather than imported as pre-compiled modules. Otherwise you may need to fix a <${name}>.`
+    );
   }
   return component;
 }
@@ -134,13 +105,13 @@ function create_ssr_component(fn) {
   };
 }
 export {
-  subscribe as a,
-  safe_not_equal as b,
+  setContext as a,
+  subscribe as b,
   create_ssr_component as c,
   escape as e,
   getContext as g,
   missing_component as m,
   noop as n,
-  setContext as s,
+  safe_not_equal as s,
   validate_component as v
 };

@@ -1,214 +1,160 @@
-import { c as create_ssr_component, v as validate_component } from "../../chunks/index2.js";
+import { c as create_ssr_component, v as validate_component } from "../../chunks/ssr.js";
 import * as BABYLON from "@babylonjs/core";
-import "devalue";
-import { G as Game } from "../../chunks/game.js";
+import { W as World, G as Game } from "../../chunks/world.js";
+import * as NetSerializer from "net-serializer";
+import NetSerializer__default from "net-serializer";
+import * as uuid from "uuid";
 import { Mixin } from "ts-mixer";
-class World {
-  constructor(game) {
-    this.game = game;
+const uuidType = {
+  bytes: [{ type: "uint8" }]
+};
+var State = /* @__PURE__ */ ((State2) => {
+  State2[State2["HANDSHAKING"] = 0] = "HANDSHAKING";
+  State2[State2["STATUS"] = 1] = "STATUS";
+  State2[State2["LOGIN"] = 2] = "LOGIN";
+  State2[State2["CONFIG"] = 3] = "CONFIG";
+  State2[State2["PLAY"] = 4] = "PLAY";
+  return State2;
+})(State || {});
+const stateType = { type: "uint8" };
+const genericPacketInfoType = {
+  packetName: { type: "string" },
+  packetId: { type: "uint8" },
+  packetState: stateType
+};
+const _ServerboundHandshakePacketData = class _ServerboundHandshakePacketData2 {
+  constructor(protocol, nextState) {
+    this.protocol = protocol;
+    this.nextState = nextState;
   }
-}
-class Entity {
-  constructor() {
-    this.velH = new BABYLON.Vector3(0, 0, 0);
-    this.vely = 0;
-    this.facingDirection = new BABYLON.Vector3(0, 0, 1).normalize();
-    this.onGround = false;
-    this.onWall = false;
-  }
-  setMesh(mesh) {
-    this.mesh = mesh;
-    return this;
-  }
-  setPositionAndRotation(pos, rot) {
-    this.pos = this.mesh.position = pos;
-    this.rot = this.mesh.rotationQuaternion = rot;
-    return this;
-  }
-  setWorld(world) {
-    this.world = world;
-    return this;
-  }
-}
-class Player extends Entity {
-  constructor() {
-    super(...arguments);
-    this.maxHSpeed = -1;
-    this.canWallJump = true;
-    this.lastWallWallJumpedFrom = null;
-    this.jumpState = false;
-  }
-  get gravity() {
-    if (this.onWall)
-      return -1.667;
-    if (this.inputController.jumpPressed)
-      return -1.8;
-    return -2;
-  }
-  get hMovementScaleFactor() {
-    return this.onGround ? 5 : 1;
-  }
-}
-class EntityServer extends Entity {
-  setWorld(world) {
-    this.world = world;
-    return this;
-  }
-  setMesh(mesh) {
-    this.mesh = mesh;
-    return this;
-  }
-  setPositionAndRotation(pos, rot) {
-    this.pos = this.mesh.position = pos;
-    this.rot = this.mesh.rotationQuaternion = rot;
-    return this;
-  }
-  checkCollisions() {
-    this.onGround = this.world.grounds.map(
-      (ground) => this.mesh.intersectsMesh(ground.mesh, false) ? this.mesh.intersectsMesh(ground.mesh, true) : false
-    ).reduce((p, c) => p || c, false);
-    this.onWall = this.world.walls.map(
-      (wall) => this.mesh.intersectsMesh(wall.mesh, false) ? this.mesh.intersectsMesh(wall.mesh, true) : false
-    ).reduce((p, c) => p || c, false);
-  }
-}
-class PlayerServer extends Mixin(EntityServer, Player) {
-  accelerateAndRotateH(x, z) {
-    let r = Math.sqrt(x ** 2 + z ** 2);
-    if (r > 0.01) {
-      let r1 = Math.abs(x) + Math.abs(z);
-      x *= r / r1;
-      z *= r / r1;
-      if (this.onGround) {
-        this.mesh.rotationQuaternion = BABYLON.Vector3.Up().scale(Math.atan2(z, x)).toQuaternion();
-        this.facingDirection = new BABYLON.Vector3(z, 0, x).normalize();
+  pack() {
+    return NetSerializer.pack(
+      _ServerboundHandshakePacketData2.packetInfoType,
+      {
+        protocol: this.protocol,
+        nextState: this.nextState.valueOf()
       }
-      this.velH = this.velH.add(
-        new BABYLON.Vector3(
-          this.hMovementScaleFactor * z,
-          0,
-          this.hMovementScaleFactor * x
-        )
-      );
-    }
-    if (this.onGround) {
-      this.velH.scaleToRef(0.7, this.velH);
-    }
-  }
-  jump() {
-    this.vely = 28;
-  }
-  wallJump() {
-    if (!this.facingDirection)
-      return;
-    let ray = new BABYLON.Ray(this.pos, this.facingDirection, 1);
-    let rayHelper = new BABYLON.RayHelper(ray);
-    rayHelper.show(this.world.scene, BABYLON.Color3.Red());
-    let hitNullable = this.world.scene.pickWithRay(ray, (mesh) => {
-      return this.world.walls.map((wall1) => wall1.mesh).includes(mesh);
-    });
-    if (!hitNullable)
-      return;
-    let hit = hitNullable;
-    if (!hit.pickedMesh)
-      return;
-    let wall = hit.pickedMesh;
-    if (!(this.lastWallWallJumpedFrom === null) && this.lastWallWallJumpedFrom?.mesh !== wall) {
-      let normalVectorNullable = hit.getNormal(true);
-      if (!normalVectorNullable)
-        return;
-      let normalVector = normalVectorNullable;
-      console.debug([wall, normalVector]);
-      if (!hit.pickedPoint)
-        return;
-      let rayNormal = new BABYLON.Ray(hit.pickedPoint, normalVector, 1);
-      new BABYLON.RayHelper(rayNormal).show(
-        this.world.scene,
-        BABYLON.Color3.Blue()
-      );
-      let normal = new BABYLON.Quaternion(
-        normalVector.x,
-        normalVector.y,
-        normalVector.z,
-        0
-      );
-      console.assert(!!this.mesh.rotationQuaternion, "Rotation Quaternion cannot be null");
-      this.mesh.rotationQuaternion = normal.multiply(this.mesh.rotationQuaternion.multiply(normal)).normalize();
-      this.velH = this.velH.subtract(
-        normalVectorNullable.scale(2 * BABYLON.Vector3.Dot(this.velH, normalVectorNullable))
-      );
-      this.vely = 28;
-      this.canWallJump = false;
-      this.lastWallWallJumpedFrom.mesh = wall;
-    }
-  }
-  executeJumpRoutine() {
-    if (!this.inputController.jumpPressed) {
-      this.jumpState = false;
-      this.canWallJump = true;
-    } else {
-      if (this.onGround && !this.jumpState) {
-        this.jump();
-        this.jumpState = true;
-      }
-      if (this.canWallJump && this.onWall && !this.onGround && this.inputController.joystick.length() > 0.1) {
-        this.wallJump();
-      }
-    }
-    if (this.onGround) {
-      this.lastWallWallJumpedFrom = null;
-    }
-  }
-  applyHMovementInfluences() {
-    if (this.inputController.sprintHeld && this.onGround) {
-      this.maxHSpeed *= 1.3;
-    } else if (this.inputController.sprintHeld && !this.onGround) {
-      this.maxHSpeed *= 1.2;
-    }
-    if (this.velH.length() > this.maxHSpeed) {
-      this.velH = this.velH.normalize().scale(this.maxHSpeed);
-    }
-  }
-  applyGravity() {
-    if (!this.onGround) {
-      this.vely += this.gravity;
-    }
-    if (this.onGround && this.vely < 0) {
-      this.vely = 0;
-    }
-  }
-  moveMesh() {
-    this.maxHSpeed = 2.5 + 10 * this.inputController.joystick.length();
-    if (this.inputController.joystick != null) {
-      this.accelerateAndRotateH(
-        this.inputController.joystick.x,
-        this.inputController.joystick.z
-      );
-    }
-    this.executeJumpRoutine();
-    this.applyHMovementInfluences();
-    this.applyGravity();
-    let deltay = this.vely + (!this.onGround ? this.gravity / 2 : 0);
-    if (Math.abs(deltay) > 50) {
-      deltay = 50 * (deltay === 0 ? 0 : deltay > 0 ? 1 : -1);
-    }
-    let deltaPos = new BABYLON.Vector3(this.velH.x, deltay, this.velH.z).scale(
-      1 / 60
     );
-    this.mesh.position = this.mesh.position.add(deltaPos);
-    this.pos = this.mesh.position;
-    console.assert(!!this.mesh.rotationQuaternion, "Rotation quaternion cannot be undefined");
-    this.rot = this.mesh.rotationQuaternion;
   }
-  tick(cameraAngle) {
-    console.assert(!!cameraAngle, "Camera angle cannot be undefined");
-    this.checkCollisions();
-    this.inputController.tick(this, this.world);
-    this.inputController.joystick.rotateByQuaternionToRef(cameraAngle, this.inputController.joystick);
-    this.checkCollisions();
-    this.moveMesh();
+  unpack(buffer) {
+    const value = NetSerializer.unpack(buffer, _ServerboundHandshakePacketData2.packetInfoType);
+    this.protocol = value.protocol;
+    this.nextState = value.nextState;
   }
-}
+};
+_ServerboundHandshakePacketData.genericPacketInfo = {
+  packetName: "Serverbound Handshake",
+  packetId: 0,
+  packetState: 0 .valueOf()
+};
+_ServerboundHandshakePacketData.packetInfoType = {
+  protocol: { type: "uint32" },
+  nextState: stateType
+};
+let ServerboundHandshakePacketData = _ServerboundHandshakePacketData;
+const _ServerboundLoginStartPacketData = class _ServerboundLoginStartPacketData2 {
+  constructor(playerName, playerUUID) {
+    this.playerName = playerName;
+    this.playerUUID = playerUUID;
+  }
+  pack() {
+    return NetSerializer.pack(
+      _ServerboundLoginStartPacketData2.packetInfoType,
+      {
+        playerName: this.playerName,
+        playerUUID: !!this.playerUUID ? uuid.parse(this.playerUUID) : []
+      }
+    );
+  }
+  unpack(buffer) {
+    const value = NetSerializer.unpack(buffer, _ServerboundLoginStartPacketData2.packetInfoType);
+    this.playerName = value.playerName;
+    if (value.playerUUID.length != 0) {
+      this.playerUUID = uuid.stringify(value.playerUUID);
+    }
+  }
+};
+_ServerboundLoginStartPacketData.genericPacketInfo = {
+  packetName: "Serverbound Login Start",
+  packetId: 0,
+  packetState: 2 .valueOf()
+};
+_ServerboundLoginStartPacketData.packetInfoType = {
+  playerName: { type: "string" },
+  playerUUID: uuidType
+};
+let ServerboundLoginStartPacketData = _ServerboundLoginStartPacketData;
+const _ServerboundDisconnectStartPacketData = class _ServerboundDisconnectStartPacketData2 {
+  pack() {
+    return NetSerializer.pack(
+      _ServerboundDisconnectStartPacketData2.packetInfoType,
+      {}
+    );
+  }
+  unpack(buffer) {
+    NetSerializer.unpack(buffer, _ServerboundDisconnectStartPacketData2.packetInfoType);
+  }
+};
+_ServerboundDisconnectStartPacketData.genericPacketInfo = {
+  packetName: "Serverbound Disconnect Start",
+  packetId: 112,
+  packetState: 4 .valueOf()
+};
+_ServerboundDisconnectStartPacketData.packetInfoType = {};
+let ServerboundDisconnectStartPacketData = _ServerboundDisconnectStartPacketData;
+const _ServerboundKeepAlivePacketData = class _ServerboundKeepAlivePacketData2 {
+  constructor(keepAliveID) {
+    this.keepAliveID = keepAliveID;
+  }
+  pack() {
+    return NetSerializer.pack(
+      _ServerboundKeepAlivePacketData2.packetInfoType,
+      {
+        keepAliveID: this.keepAliveID
+      }
+    );
+  }
+  unpack(buffer) {
+    const value = NetSerializer.unpack(buffer, _ServerboundKeepAlivePacketData2.packetInfoType);
+    this.keepAliveID = value.keepAliveID;
+  }
+};
+_ServerboundKeepAlivePacketData.genericPacketInfo = {
+  packetName: "Serverbound Keep Alive",
+  packetId: 35,
+  packetState: 4 .valueOf()
+};
+_ServerboundKeepAlivePacketData.packetInfoType = {
+  keepAliveID: { type: "uint32" }
+};
+let ServerboundKeepAlivePacketData = _ServerboundKeepAlivePacketData;
+const _ClientboundKeepAlivePacketData = class _ClientboundKeepAlivePacketData2 {
+  constructor(keepAliveID) {
+    this.keepAliveID = keepAliveID;
+  }
+  pack() {
+    return NetSerializer.pack(
+      _ClientboundKeepAlivePacketData2.packetInfoType,
+      {
+        keepAliveID: this.keepAliveID
+      }
+    );
+  }
+  unpack(buffer) {
+    const value = NetSerializer.unpack(buffer, _ClientboundKeepAlivePacketData2.packetInfoType);
+    this.keepAliveID = value.keepAliveID;
+  }
+};
+_ClientboundKeepAlivePacketData.genericPacketInfo = {
+  packetName: "Clientbound Keep Alive",
+  packetId: 18,
+  packetState: 4 .valueOf()
+};
+_ClientboundKeepAlivePacketData.packetInfoType = {
+  keepAliveID: { type: "uint32" }
+};
+let ClientboundKeepAlivePacketData = _ClientboundKeepAlivePacketData;
+let PROTOCOL = 0;
 class PlayerInputController {
   constructor() {
     this.joystick = BABYLON.Vector3.Zero();
@@ -265,28 +211,91 @@ class PlayerInputController {
       let gamepadSource = this.deviceSourceManager.getDeviceSource(
         BABYLON.DeviceType.Switch
       );
-      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(3) === 1 || gamepadSource.getInput(2) === 1;
+      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(BABYLON.SwitchInput.A) === 1 || gamepadSource.getInput(BABYLON.SwitchInput.B) === 1;
       this.setJoystickIfBigger(
-        -gamepadSource.getInput(23),
-        gamepadSource.getInput(22)
+        -gamepadSource.getInput(BABYLON.SwitchInput.LStickXAxis),
+        gamepadSource.getInput(BABYLON.SwitchInput.LStickYAxis)
       );
-      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(0) === 1 || gamepadSource.getInput(1) === 1;
+      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(BABYLON.SwitchInput.X) === 1 || gamepadSource.getInput(BABYLON.SwitchInput.Y) === 1;
+    }
+    if (this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Xbox)) {
+      let gamepadSource = this.deviceSourceManager.getDeviceSource(
+        BABYLON.DeviceType.Xbox
+      );
+      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(BABYLON.XboxInput.B) === 1 || gamepadSource.getInput(BABYLON.XboxInput.A) === 1;
+      this.setJoystickIfBigger(
+        -gamepadSource.getInput(BABYLON.XboxInput.LStickXAxis),
+        gamepadSource.getInput(BABYLON.XboxInput.LStickYAxis)
+      );
+      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(BABYLON.XboxInput.X) === 1 || gamepadSource.getInput(BABYLON.XboxInput.Y) === 1;
     }
     if (this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualSense)) {
       let gamepadSource = this.deviceSourceManager.getDeviceSource(
         BABYLON.DeviceType.DualSense
       );
-      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(3) === 1 || gamepadSource.getInput(2) === 1;
+      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(BABYLON.DualSenseInput.Square) === 1 || gamepadSource.getInput(BABYLON.DualSenseInput.Triangle) === 1;
       this.setJoystickIfBigger(
-        -gamepadSource.getInput(19),
-        gamepadSource.getInput(18)
+        -gamepadSource.getInput(BABYLON.DualSenseInput.LStickXAxis),
+        gamepadSource.getInput(BABYLON.DualSenseInput.LStickYAxis)
       );
-      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(0) === 1 || gamepadSource.getInput(1) === 1;
+      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(BABYLON.DualSenseInput.Circle) === 1 || gamepadSource.getInput(BABYLON.DualSenseInput.Cross) === 1;
+    }
+    if (this.deviceSourceManager.getDeviceSource(BABYLON.DeviceType.DualShock)) {
+      let gamepadSource = this.deviceSourceManager.getDeviceSource(
+        BABYLON.DeviceType.DualShock
+      );
+      this.sprintHeld = this.sprintHeld || gamepadSource.getInput(BABYLON.DualShockInput.Square) === 1 || gamepadSource.getInput(BABYLON.DualShockInput.Triangle) === 1;
+      this.setJoystickIfBigger(
+        -gamepadSource.getInput(BABYLON.DualShockInput.LStickXAxis),
+        gamepadSource.getInput(BABYLON.DualShockInput.LStickYAxis)
+      );
+      this.jumpPressed = this.jumpPressed || gamepadSource.getInput(BABYLON.DualShockInput.Circle) === 1 || gamepadSource.getInput(BABYLON.DualShockInput.Cross) === 1;
     }
     this.joystick.rotateByQuaternionToRef(
-      worldClient.camera.rotationQuaternion,
+      worldClient.game.camera.rotationQuaternion,
       this.joystick
     );
+  }
+}
+class Entity {
+  constructor() {
+    this.velH = new BABYLON.Vector3(0, 0, 0);
+    this.vely = 0;
+    this.facingDirection = new BABYLON.Vector3(0, 0, 1).normalize();
+    this.onGround = false;
+    this.onWall = false;
+  }
+  setMesh(mesh) {
+    this.mesh = mesh;
+    return this;
+  }
+  setPositionAndRotation(pos, rot) {
+    this.pos = this.mesh.position = pos;
+    this.rot = this.mesh.rotationQuaternion = rot;
+    return this;
+  }
+  setWorld(world) {
+    this.world = world;
+    return this;
+  }
+}
+class Player extends Entity {
+  constructor() {
+    super(...arguments);
+    this.maxHSpeed = -1;
+    this.canWallJump = true;
+    this.lastWallWallJumpedFrom = null;
+    this.jumpState = false;
+  }
+  get gravity() {
+    if (this.onWall)
+      return -1.667;
+    if (this.inputController.jumpPressed)
+      return -1.8;
+    return -2;
+  }
+  get hMovementScaleFactor() {
+    return this.onGround ? 5 : 1;
   }
 }
 class EntityClient extends Entity {
@@ -305,9 +314,6 @@ class PlayerClient extends Mixin(EntityClient, Player) {
   }
 }
 class WorldClient extends World {
-  constructor(game) {
-    super(game);
-  }
   load() {
     new BABYLON.HemisphericLight(
       "hemi",
@@ -370,91 +376,67 @@ class WorldClient extends World {
   tick() {
   }
 }
-var State = /* @__PURE__ */ ((State2) => {
-  State2[State2["HANDSHAKING"] = 0] = "HANDSHAKING";
-  State2[State2["STATUS"] = 1] = "STATUS";
-  State2[State2["LOGIN"] = 2] = "LOGIN";
-  State2[State2["PLAY"] = 3] = "PLAY";
-  return State2;
-})(State || {});
-class ServerboundHandshakePacket {
-  constructor(protocol, nextState) {
-    this.packetName = "Serverbound Handshake";
-    this.packetId = 0;
-    this.packetState = 0;
-    this.protocol = protocol;
-    this.nextState = nextState;
-  }
-}
-class ServerboundLoginStartPacket {
-  constructor(playerName, playerUUID) {
-    this.packetName = "Serverbound Login Start";
-    this.packetId = 0;
-    this.packetState = 2;
-    this.playerName = playerName;
-    this.playerUUID = playerUUID;
-  }
-}
-class ServerboundDisconnectStartPacket {
-  constructor() {
-    this.packetName = "Serverbound Disconnect Start";
-    this.packetId = 112;
-    this.packetState = 3;
-  }
-}
-class ServerboundKeepAlivePacket {
-  constructor(keepAliveID) {
-    this.packetName = "Serverbound Keep Alive";
-    this.packetId = 35;
-    this.packetState = 3;
-    this.keepAliveID = keepAliveID;
-  }
-}
-let PROTOCOL = 0;
-function keepAliveTimeoutCallback(connectClient) {
-  console.warn("Timed out from server!");
-  connectClient.disconnect();
-  return;
-}
 class ConnectClient {
-  constructor() {
+  constructor(game) {
     this.currentState = State.HANDSHAKING;
-    this.game = null;
     this.hasGottenKeepAlive = false;
+    this.keepAliveTimeout = void 0;
+    this.setGame(game);
   }
   setGame(game) {
     console.debug("game = game$");
     this.game = game;
   }
+  send(packet) {
+    let packetInfoBuffer = NetSerializer__default.pack(packet.genericPacketInfo, genericPacketInfoType);
+    let packetDataBuffer = packet.packetData.pack();
+    let buffer = new Uint8Array(2 + packetInfoBuffer.byteLength + packetDataBuffer.byteLength);
+    let high = packetInfoBuffer.byteLength >> 8 & 255;
+    let low = packetInfoBuffer.byteLength & 255;
+    buffer.set([low, high], 0);
+    buffer.set(new Uint8Array(packetInfoBuffer), 2);
+    buffer.set(new Uint8Array(packetDataBuffer), packetInfoBuffer.byteLength + 2);
+    this.socket.send(buffer);
+  }
   connect(name, event, playerUUID) {
-    this.send(new ServerboundHandshakePacket(PROTOCOL, State.LOGIN));
+    this.send({
+      genericPacketInfo: ClientboundKeepAlivePacketData.genericPacketInfo,
+      packetData: new ServerboundHandshakePacketData(PROTOCOL, State.LOGIN)
+    });
     this.currentState = State.LOGIN;
-    this.send(new ServerboundLoginStartPacket(name, playerUUID));
+    this.send({
+      genericPacketInfo: ClientboundKeepAlivePacketData.genericPacketInfo,
+      packetData: new ServerboundLoginStartPacketData(name, playerUUID)
+    });
   }
   disconnect() {
     if (!!this.keepAliveTimeout) {
       clearTimeout(this.keepAliveTimeout);
+      this.keepAliveTimeout = void 0;
     }
     this.game?.scene.removeCamera(this.game.camera);
-    this.game.world = null;
+    this.game.world = void 0;
     this.game?.setMenuCamera();
     console.debug("Switching user state to HANDSHAKING...");
     this.currentState = State.HANDSHAKING;
   }
   requestDisconnect(event) {
-    this.send(new ServerboundDisconnectStartPacket());
+    this.send({
+      genericPacketInfo: ServerboundDisconnectStartPacketData.genericPacketInfo,
+      packetData: new ServerboundDisconnectStartPacketData()
+    });
   }
   forceDisconnect(event) {
     this.disconnect();
   }
   clientboundPackets(packet) {
     console.debug(
-      "[Client] Recieved Packet: " + packet.packetName
+      "[Client] Received Packet: " + packet.genericPacketInfo.packetName
     );
-    if (packet.packetState === this.currentState) {
-      if (packet.packetId === 2 && packet.packetState === State.LOGIN) {
-        console.info('Login successful! Username: "' + packet.username + '" UUID: ' + packet.uuid);
-        console.info("Given User properties: [" + packet.properties + "]");
+    if (packet.genericPacketInfo.packetState === this.currentState) {
+      if (packet.genericPacketInfo.packetId === 2 && packet.genericPacketInfo.packetState === State.LOGIN) {
+        console.info('Login successful! Username: "' + packet.packetData.username + '" UUID: ' + packet.packetData.uuid);
+        console.info("Given User properties: [" + packet.packetData.properties + "]");
         console.debug("Switching user state to PLAY...");
         this.currentState = State.PLAY;
         console.info("Loading World...");
@@ -464,90 +446,38 @@ class ConnectClient {
         this.hasGottenKeepAlive = false;
         this.keepAliveTimeout = window.setTimeout(ConnectClient.keepAliveTimeoutCallback, 3e4, this);
       }
-      if (packet.packetId === 0 && packet.packetState === State.LOGIN) {
+      if (packet.genericPacketInfo.packetId === 0 && packet.genericPacketInfo.packetState === State.LOGIN) {
         this.disconnect();
-        console.error("Failed to connect: " + packet.reason);
+        console.error("Failed to connect: " + packet.packetData.reason);
       }
-      if (packet.packetId === 113 && packet.packetState === State.PLAY) {
+      if (packet.genericPacketInfo.packetId === 113 && packet.genericPacketInfo.packetState === State.PLAY) {
         this.disconnect();
         console.info("Disconnect Successful!");
       }
-      if (packet.packetId === 114 && packet.packetState === State.PLAY) {
+      if (packet.genericPacketInfo.packetId === 114 && packet.genericPacketInfo.packetState === State.PLAY) {
         this.disconnect();
-        console.error("Kicked: " + packet.reason);
+        console.error("Kicked: " + packet.packetData.reason);
       }
-      if (packet.packetId === 18 && packet.packetState === State.PLAY) {
+      if (packet.genericPacketInfo.packetId === 18 && packet.genericPacketInfo.packetState === State.PLAY) {
         this.hasGottenKeepAlive = true;
-        this.send(new ServerboundKeepAlivePacket(packet.keepAliveID));
+        this.send(
+          /** @type {import("../../common/network/packets").Packet} */
+          {
+            genericPacketInfo: ServerboundKeepAlivePacketData.genericPacketInfo,
+            packetData: new ServerboundKeepAlivePacketData(packet.packetData.keepAliveID)
+          }
+        );
         clearTimeout(this.keepAliveTimeout);
-        this.keepAliveTimeout = window.setTimeout(keepAliveTimeoutCallback, 3e4, this);
+        this.keepAliveTimeout = window.setTimeout(ConnectClient.keepAliveTimeoutCallback, 3e4, this);
       }
     } else {
-      console.error("Packet for Wrong State: " + packet.packetState + " vs " + this.currentState);
+      console.error("Packet for Wrong State: " + packet.genericPacketInfo.packetState + " vs " + this.currentState);
     }
   }
-}
-const serverWorkerURL = "/_app/immutable/workers/server-worker-3233ed2f.js";
-class ConnectClientLocal extends ConnectClient {
-  constructor() {
-    super(...arguments);
-    this.worker = null;
-  }
-  send(packet) {
-    if (!this.worker) {
-      console.error('Tried to send packet " ' + packet.packetName + '" without active worker thread!');
-      return;
-    }
-    console.debug('Sending packet "' + packet.packetName + '" over port ' + this.worker?.port);
-    this.worker?.port.postMessage(packet);
-  }
-  connect(name, event, playerUUID) {
-    if (!!this.worker) {
-      console.error("Tried to connect to server while already connected!");
-      return;
-    }
-    console.info("Connecting to local server");
-    this.worker = new SharedWorker(serverWorkerURL, {
-      type: "module"
-    });
-    this.worker.onerror = (evt) => console.error(evt.error);
-    this.worker.port.onmessage = (ev) => {
-      if (typeof ev.data === "object" && "packetName" in ev.data && "packetId" in ev.data && "packetState" in ev.data) {
-        this.clientboundPackets(ev.data);
-      } else {
-        console.debug("Recieved: " + ev.data);
-      }
-    };
-    this.worker.port.onmessageerror = (ev) => {
-      console.error("Failed to send message: " + ev.data);
-    };
-    this.worker.port.start();
-    super.connect(name, event, playerUUID);
-  }
-  disconnect() {
-    if (!this.worker) {
-      console.error("Tried to disconnect from server despite not being connect to one!");
-      return;
-    }
-    this.worker.port.close();
-    this.worker = null;
-    super.disconnect();
-  }
-  requestDisconnect(event) {
-    if (!this.worker) {
-      console.error("Tried to request disconnection from server despite not being connect to one!");
-      return;
-    }
-    console.info("Requesting to disconnect from local server");
-    super.requestDisconnect(event);
-  }
-  forceDisconnect(event) {
-    if (!this.worker) {
-      console.error("Tried to forcefully disconnect from server despite not being connect to one!");
-      return;
-    }
-    console.info("Forcefully disconnecting from local server");
-    this.disconnect();
+  static keepAliveTimeoutCallback(connectClient) {
+    console.warn("Timed out from server!");
+    connectClient.disconnect();
+    return;
   }
 }
 const gameClient_svelte_svelte_type_style_lang = "";
@@ -562,8 +492,7 @@ const GameClient_1 = create_ssr_component(($$result, $$props, $$bindings, slots)
       this.name = "Game";
       this.ready = new Promise((resolve, reject) => {
       });
-      this.connectClient = new ConnectClientLocal();
-      this.connectClient.setGame(this);
+      this.connectClient = new ConnectClient(this);
     }
     init(resolve, reject) {
       this.canvas = document.getElementById("renderCanvas");
@@ -575,7 +504,7 @@ const GameClient_1 = create_ssr_component(($$result, $$props, $$bindings, slots)
     async createEngine() {
       const webGPUSupported = await BABYLON.WebGPUEngine.IsSupportedAsync;
       console.log("Using WebGPU: " + webGPUSupported);
-      if (webGPUSupported && false) {
+      if (webGPUSupported) {
         this.engine = new BABYLON.WebGPUEngine(this.canvas, { antialias: true, stencil: true });
         await this.engine.initAsync();
       } else {
@@ -589,6 +518,7 @@ const GameClient_1 = create_ssr_component(($$result, $$props, $$bindings, slots)
           }
         );
       }
+      console.log("Engine initialized...");
       return this.engine;
     }
     async createScene() {
@@ -633,20 +563,10 @@ const GameClient_1 = create_ssr_component(($$result, $$props, $$bindings, slots)
   if ($$props.EventHandler === void 0 && $$bindings.EventHandler && EventHandler !== void 0)
     $$bindings.EventHandler(EventHandler);
   $$result.css.add(css);
-  return `
-
-
-<canvas id="renderCanvas" class="svelte-1a46o45"></canvas>
-<button>Connect to Server</button>
-<button>Disconnect from Server</button>
-<button>Forcefully Disconnect from Server</button>`;
+  return `  <canvas id="renderCanvas" class="svelte-1a46o45"></canvas> <button data-svelte-h="svelte-1e7pysx">Connect to Server</button> <button data-svelte-h="svelte-jzc4o2">Disconnect from Server</button> <button data-svelte-h="svelte-luy4bh">Forcefully Disconnect from Server</button>`;
 });
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  return `
-
-
-${validate_component(GameClient_1, "GameClient").$$render($$result, {}, {}, {})}
-`;
+  return `  ${validate_component(GameClient_1, "GameClient").$$render($$result, {}, {}, {})}`;
 });
 export {
   Page as default
