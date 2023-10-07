@@ -19,3 +19,52 @@
 import * as NetSerializer from "net-serializer";
 import * as uuid from "uuid"
 
+export enum State {
+    HANDSHAKING,
+    LOGIN,
+    CONFIG,
+    PLAY
+}
+
+export class PacketType {
+    public id: number;
+    public state: State;
+
+    public constructor(id: number, state: State)
+    {
+        this.id = id;
+        this.state = state;
+    }
+};
+
+let packetTypes: Set<PacketType> = new Set<PacketType>();
+
+export abstract class Packet
+{
+    public id: number;
+    public state: State;
+
+    public constructor(id: number, state: State)
+    {
+        this.id = id;
+        this.state = state;
+    }
+
+    public abstract toBuffer(): ArrayBuffer;
+    public abstract fromBuffer(buffer: ArrayBuffer): PacketType;
+}
+
+export function fromBuffer(buffer: ArrayBuffer): PacketType
+{
+    let intBuffer: Int8Array = new Int8Array(buffer);
+    let id = intBuffer.at(0) as number;
+    let state = intBuffer.at(1) as State;
+
+    for (const packetType of packetTypes) {
+        if (packetType.id === id && packetType.state === state)
+        {
+            return packetType;
+        }
+    }
+    throw "Invalid packet for State: " + id + ":" + state
+}

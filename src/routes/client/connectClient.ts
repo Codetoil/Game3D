@@ -17,18 +17,7 @@
  */
 
 import {
-    ServerboundDisconnectStartPacketData,
-    ClientboundLoginSuccessPacketData,
-    State,
-    type Packet,
-    type PacketData,
-    ServerboundHandshakePacketData,
-    ServerboundLoginStartPacketData,
-    ClientboundKickPacketData,
-    ServerboundKeepAlivePacketData,
-    ClientboundKeepAlivePacketData,
-    ClientboundDisconnectPacketData,
-    genericPacketInfoType
+    
 } from "../common/network/packets";
 import type { Game } from "../common/game";
 import { PROTOCOL } from "../common/version";
