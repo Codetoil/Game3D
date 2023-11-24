@@ -3,3 +3,4 @@ tmp/**
 ngrok.exe
 launch-ngrok.bat
 dist/**
+package-lock.json
