@@ -2,4 +2,3 @@ node_modules/**
 tmp/**
 ngrok.exe
 launch-ngrok.bat
-3d_game

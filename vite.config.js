@@ -1,11 +1,13 @@
-import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 
-/** @type {import('vite').UserConfig} */
-const config = {
-	plugins: [sveltekit()],
-	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
-	}
-};
-
-export default config;
+export default defineConfig({
+	// ...vite configures
+	server: {
+		// vite server configs, for details see [vite doc](https://vitejs.dev/config/#server-host)
+		port: 3000
+	},
+	plugins: [],
+	optimizeDeps: {
+		
+	},
+});
