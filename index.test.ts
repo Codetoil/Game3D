@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
+
+it('should work', (ctx) => {
+    // prints name of the test
+    console.log(ctx.task.name)
+})
 
 export { };

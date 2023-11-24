@@ -6,11 +6,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "playwright test",
-    "test:unit": "vitest"
+    "test": "vitest"
   },
   "devDependencies": {
-    "@playwright/test": "1.40.0",
     "@types/uuid": "9.0.7",
     "@types/ws": "8.5.10",
     "@typescript-eslint/eslint-plugin": "6.12.0",
