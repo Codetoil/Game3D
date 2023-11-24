@@ -18,25 +18,25 @@
 import { GameServer } from "./server/gameServer";
 
 let gameServer = new GameServer();
-    const ready = new Promise<GameServer>((resolve, reject) => gameServer.init);
-    ready.then((value) => {
-        value.engine.runRenderLoop(() => {
-            if (
-                value.started &&
-                !value.stopped &&
-                value.world?.game.scene &&
-                value.world?.game.scene.activeCamera
-            ) {
-                try {
-                    value.world?.game.scene.render();
-                } catch (e: any) {
-                    console.error(e);
-                    value.stopped = true;
-                }
-            } else if (value.stopped && value.engine) {
-                value.engine.stopRenderLoop();
-                console.error("Stopping game...");
+const ready = new Promise<GameServer>((resolve, reject) => gameServer.init);
+ready.then((value) => {
+    value.engine.runRenderLoop(() => {
+        if (
+            value.started &&
+            !value.stopped &&
+            value.world?.game.scene &&
+            value.world?.game.scene.activeCamera
+        ) {
+            try {
+                value.world?.game.scene.render();
+            } catch (e: any) {
+                console.error(e);
+                value.stopped = true;
             }
-        });
-    })
+        } else if (value.stopped && value.engine) {
+            value.engine.stopRenderLoop();
+            console.error("Stopping game...");
+        }
+    });
+})
 

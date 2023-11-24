@@ -26,9 +26,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run build
-      - run: npm test
       - name: Upload Output
         uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist
+      - run: npm test
